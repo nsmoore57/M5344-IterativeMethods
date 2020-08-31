@@ -13,11 +13,7 @@ def test_CholeskyFactorization_Correct():
     tol = np.finfo(np.float64).eps
 
     n = 10
-    ex = np.ones(n, dtype="double")
-    data = np.array([-ex, 2*ex, -ex])
-    offsets = np.array([1,0,-1])
     A = sp.diags([-1, 2, -1], [-1, 0, 1], shape=(n,n), dtype="d", format="dia")
-
     L = Chol.CholeskyFactorization(A)
     # Check if the relative error is less than machine epsilon
     assert LA.norm(L*L.T - A, ord=np.inf)/LA.norm(A,ord=np.inf) < tol
@@ -26,9 +22,6 @@ def test_CholeskyFactorization_Convert():
     tol = np.finfo(np.float64).eps
 
     n = 10
-    ex = np.ones(n, dtype="double")
-    data = np.array([-ex, 2*ex, -ex])
-    offsets = np.array([1,0,-1])
     A = sp.diags([-1, 2, -1], [-1, 0, 1], shape=(n,n), dtype="d", format="dok")
     L = Chol.CholeskyFactorization(A)
     # Check if the relative error is less than machine epsilon

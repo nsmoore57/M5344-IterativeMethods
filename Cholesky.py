@@ -10,18 +10,18 @@ def CholeskyFactorization(A):
     """
 
     # Check if the matrix is in dia_matrix format, and convert otherwise
-    if type(A) == sp.dia_matrix:
+    if sp.isspmatrix_dia(A):
         T = A
     else:
         T = sp.dia_matrix(A)
 
     # Check the dimensions
-    (m,n) = T.shape
+    (m, n) = T.shape
     if m != n:
         raise RuntimeError("Matrix must be square")
 
     # Check if the matrix is tridiagonal
-    if not(_isTridiagonal(T)):
+    if not _isTridiagonal(T):
         raise RuntimeError("Matrix must be tridiagonal")
 
     # Check for symmetry
@@ -50,9 +50,7 @@ def CholeskyFactorization(A):
         if i < n-1:
             L_sub_diag[i] /= L_main_diag[i]
 
-    L = sp.dia_matrix((n,n), dtype="d")
-    L.setdiag(L_main_diag,k=0)
-    L.setdiag(L_sub_diag,k=-1)
+    L = sp.diags([L_main_diag, L_sub_diag], [0, -1])
     return L
 
 
