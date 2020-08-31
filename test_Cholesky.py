@@ -9,7 +9,7 @@ import pytest
 
 def test_CholeskyFactorization():
     """Tests the Cholesky.CholeskyFactorization Method"""
-    tol = 1e-15
+    tol = 1e-8
 
     n = 10
     ex = np.ones(n, dtype="double")
@@ -18,11 +18,11 @@ def test_CholeskyFactorization():
     A = sp.dia_matrix((data,offsets), shape=(n,n))
 
     L = Chol.CholeskyFactorization(A)
-    # assert LA.norm(L*L.T - A, ord=np.inf) < tol
+    assert LA.norm(L*L.T - A, ord=np.inf) < tol
 
     A = sp.dok_matrix(A)
     L = Chol.CholeskyFactorization(A)
-    # assert LA.norm(L*L.T - A, ord=np.inf) < tol
+    assert LA.norm(L*L.T - A, ord=np.inf) < tol
 
     main_diag = 4.0*np.ones(4, dtype="double")
     sup_diag = np.array([0, 1, 2, 1], dtype="double")
@@ -30,9 +30,9 @@ def test_CholeskyFactorization():
     data = np.vstack((sup_diag, main_diag, sub_diag))
     A = sp.dia_matrix((data, offsets), shape=(4,4))
 
-    # with pytest.raises(RuntimeError) as excinfo:
-    #     L = Chol.CholeskyFactorization(A)
-    #     assert "Matrix must be symmetric" in str(excinfo.value)
+    with pytest.raises(RuntimeError) as excinfo:
+        L = Chol.CholeskyFactorization(A)
+    assert "Matrix must be symmetric" in str(excinfo.value)
 
     main_diag = 4.0*np.ones(4, dtype="double")
     main_diag[2] = 0.5
@@ -40,9 +40,9 @@ def test_CholeskyFactorization():
     data = np.vstack((sup_diag, main_diag, sup_diag))
     A = sp.dia_matrix((data, offsets), shape=(4,4))
 
-    # with pytest.raises(RuntimeError) as excinfo:
-    #     L = Chol.CholeskyFactorization(A)
-    # assert "Matrix must be positive definite" in str(excinfo.value)
+    with pytest.raises(RuntimeError) as excinfo:
+        L = Chol.CholeskyFactorization(A)
+    assert "Matrix must be positive definite" in str(excinfo.value)
 
     main_diag = 4.0*np.ones(4, dtype="double")
     sup_diag = np.ones(4, dtype="double")
@@ -53,7 +53,6 @@ def test_CholeskyFactorization():
 
     with pytest.raises(RuntimeError) as excinfo:
         L = Chol.CholeskyFactorization(A)
-
     assert "Matrix must be tridiagonal" in str(excinfo.value)
 
     main_diag = 4.0*np.ones(5, dtype="double")
@@ -63,5 +62,4 @@ def test_CholeskyFactorization():
 
     with pytest.raises(RuntimeError) as excinfo:
         L = Chol.CholeskyFactorization(A)
-
     assert "Matrix must be square" in str(excinfo.value)
