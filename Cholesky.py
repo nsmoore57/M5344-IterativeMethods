@@ -57,25 +57,25 @@ def CholeskyFactorization(A):
 
 
 
-def _isTridiagonal(L):
+def _isTridiagonal(T):
     """
     Checks to see whether L is tridiagonal.
     L must be in scipy.sparse.dia_matrix form
     """
     # First check if there's 3 diagonals
-    if len(L.offsets) != 3:
+    if len(T.offsets) != 3:
         return False
 
     # Check for the main diagonal
-    if 0 not in L.offsets:
+    if 0 not in T.offsets:
         return False
 
     # Check for a super diagonal
-    if 1 not in L.offsets:
+    if 1 not in T.offsets:
         return False
 
     # Check for a sub diagonal
-    if -1 not in L.offsets:
+    if -1 not in T.offsets:
         return False
 
     return True
