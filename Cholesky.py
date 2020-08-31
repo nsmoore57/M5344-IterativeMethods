@@ -3,28 +3,6 @@
 import numpy as np
 import scipy.sparse as sp
 
-# Define Exceptions
-class CholeskyError(Exception):
-    """Base class for other exceptions"""
-    pass
-
-class NonSymmetricError(CholeskyError):
-    """For errors when the input matrix is non-symmetric"""
-    pass
-
-class IndefiniteErros(CholeskyError):
-    """For errors when the input matrix is indefinite"""
-    pass
-
-class NonTridiagonalError(CholeskyError):
-    """For errors when the input matrix is not tridiagonal"""
-    pass
-
-class SizeError(CholeskyError):
-    """For errors when the input matrix is non-square"""
-    pass
-
-
 def CholeskyFactorization(A):
     """
     Runs a Cholesky Factorization on matrix A.
