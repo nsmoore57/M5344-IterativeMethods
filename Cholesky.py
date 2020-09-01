@@ -6,7 +6,13 @@ import scipy.sparse as sp
 def CholeskyFactorization(A):
     """
     Runs a Cholesky Factorization on matrix A.
-    Matrix A must be tridiagonal.
+
+    The matrix A is expected to be:
+    - Square
+    - Tridiagonal
+    - Symmetric
+    - Positive Definite
+    In the event the matrix fails one of these condition, a RuntimeError is raised.
     """
 
     # Check if the matrix is in dia_matrix format, and convert otherwise
@@ -24,26 +30,25 @@ def CholeskyFactorization(A):
     if not _isTridiagonal(T):
         raise RuntimeError("Matrix must be tridiagonal")
 
-    # Check for symmetry
+    # Check for symmetry - we already know it's tridiagonal, only 1 diag above and below to check
     if not all(T.diagonal(-1) == T.diagonal(1)):
         raise RuntimeError("Matrix must be symmetric")
 
-    # Make copies of the necessary diagonals of A to prevent changing A
+    # Make copies of the necessary diagonals to prevent changing the original matrix
     L_main_diag = T.diagonal(0).copy()
     L_sub_diag = T.diagonal(-1).copy()
 
     # Build L column by column
     for i in range(n):
-        # If it's the first column, don't need to subtract anything
-        if i == 0:
-            L_main_diag[i] = L_main_diag[i]
-        else:
+        # Only need the subtraction if not the first column
+        if i > 0:
             L_main_diag[i] -= L_sub_diag[i-1]*L_sub_diag[i-1]
 
         # Check if matrix is indefinite here to prevent complex arithmetic cost
         if L_main_diag[i] < 0:
             raise RuntimeError("Matrix must be positive definite")
 
+        # Now that we know it's positive, can take the square root
         L_main_diag[i] = np.sqrt(L_main_diag[i])
 
         # Subdiagonal is one element shorter than main diagonal so can't assign at i == n-1
@@ -52,8 +57,6 @@ def CholeskyFactorization(A):
 
     L = sp.diags([L_main_diag, L_sub_diag], [0, -1])
     return L
-
-
 
 def _isTridiagonal(T):
     """
@@ -68,11 +71,11 @@ def _isTridiagonal(T):
     if 0 not in T.offsets:
         return False
 
-    # Check for a super diagonal
+    # Check for the super diagonal
     if 1 not in T.offsets:
         return False
 
-    # Check for a sub diagonal
+    # Check for the sub diagonal
     if -1 not in T.offsets:
         return False
 
