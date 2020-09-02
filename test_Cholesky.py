@@ -55,10 +55,9 @@ def test_CholeskyFactorization_Symmetric():
     print("-----------------------------------------------------")
     offsets = np.array([1,0,-1])
     main_diag = 4.0*np.ones(4, dtype="double")
-    sup_diag = np.array([0, 1, 2, 1], dtype="double")
-    sub_diag = np.ones(4, dtype="double")
-    data = np.vstack((sup_diag, main_diag, sub_diag))
-    A = sp.dia_matrix((data, offsets), shape=(4,4))
+    sup_diag = np.array([1, 2, 1], dtype="double")
+    sub_diag = np.ones(3, dtype="double")
+    A = sp.diags([sup_diag, main_diag, sub_diag], offsets, shape=(4,4), dtype="d", format="dia")
     print("Matrix A is\n", A.toarray())
 
     with pytest.raises(RuntimeError) as excinfo:
@@ -73,9 +72,8 @@ def test_CholeskyFactorization_Definite():
     offsets = np.array([1,0,-1])
     main_diag = 4.0*np.ones(4, dtype="double")
     main_diag[2] = 0.5
-    sup_diag = np.ones(4, dtype="double")
-    data = np.vstack((sup_diag, main_diag, sup_diag))
-    A = sp.dia_matrix((data, offsets), shape=(4,4))
+    sup_diag = np.ones(3, dtype="double")
+    A = sp.diags([sup_diag, main_diag, sup_diag], offsets, shape=(4,4), dtype="d", format="dia")
     print("Matrix A is\n", A.toarray())
 
     with pytest.raises(RuntimeError) as excinfo:
@@ -89,9 +87,8 @@ def test_CholeskyFactorization_Tridiagonal():
     print("-----------------------------------------------------")
     offsets = np.array([1,0,-1])
     main_diag = 4.0*np.ones(4, dtype="double")
-    sup_diag = np.ones(4, dtype="double")
-    data = np.vstack((sup_diag, main_diag, sup_diag))
-    A = sp.dia_matrix((data, offsets), shape=(4,4)).todok()
+    sup_diag = np.ones(3, dtype="double")
+    A = sp.diags([sup_diag, main_diag, sup_diag], offsets, shape=(4,4), dtype="d", format="dia").todok()
     A[1,3] = A[3,1] = 1.0
     A = sp.dia_matrix(A)
     print("Matrix A is\n", A.toarray())
@@ -106,10 +103,10 @@ def test_CholeskyFactorization_Square():
     print("Testing that the function throws an error for non-square")
     print("-----------------------------------------------------")
     offsets = np.array([1,0,-1])
-    main_diag = 4.0*np.ones(5, dtype="double")
-    sup_diag = np.ones(5, dtype="double")
+    main_diag = 4.0*np.ones(4, dtype="double")
+    sup_diag = np.ones(4, dtype="double")
     data = np.vstack((sup_diag, main_diag, sup_diag))
-    A = sp.dia_matrix((data, offsets), shape=(4,5))
+    A = sp.diags([sup_diag, main_diag, sup_diag], offsets, shape=(4,5), dtype="d", format="dia")
     print("Matrix A is\n", A.toarray())
 
     with pytest.raises(RuntimeError) as excinfo:
