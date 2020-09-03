@@ -40,7 +40,7 @@ def CholeskyFactorization(A):
 
     # Build L column by column
     for i in range(n):
-        # Only need the subtraction if not the first column
+        # The first column doesn't need anything subtracted
         if i > 0:
             L_main_diag[i] -= L_sub_diag[i-1]*L_sub_diag[i-1]
 
@@ -55,7 +55,7 @@ def CholeskyFactorization(A):
         if i < n-1:
             L_sub_diag[i] /= L_main_diag[i]
 
-    L = sp.diags([L_main_diag, L_sub_diag], [0, -1])
+    L = sp.diags([L_main_diag, L_sub_diag], [0, -1], dtype=np.double, format="dia")
     return L
 
 def _isTridiagonal(T):
