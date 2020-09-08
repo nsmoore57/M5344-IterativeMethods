@@ -22,7 +22,7 @@ def _Sub_and_Main_Diag_Only(A):
 
 def test_CholeskyFactorization_Correct():
     """Tests the Cholesky.CholeskyFactorization for correct factorization"""
-    print("-----------------------------------------------------")
+    print("\n-----------------------------------------------------")
     print("Testing the correctness of the Cholesky Factorization")
     print("-----------------------------------------------------")
     # tolerance is machine epsilon
@@ -102,7 +102,7 @@ def test_CholeskyFactorization_Symmetric():
     with pytest.raises(RuntimeError) as excinfo:
         Chol.CholeskyFactorization(A)
     assert "Matrix must be symmetric" in str(excinfo.value)
-    print("Function successfully raised error: Matrix must be symmetric")
+    print("Function successfully raised error: ", str(excinfo.value))
 
 def test_CholeskyFactorization_Definite():
     """Test that CholeskyFactorization errors for indefinite matrices"""
@@ -122,7 +122,7 @@ def test_CholeskyFactorization_Definite():
     with pytest.raises(RuntimeError) as excinfo:
         Chol.CholeskyFactorization(A)
     assert "Matrix must be positive definite" in str(excinfo.value)
-    print("Function successfully raised error: Matrix must be positive definite")
+    print("Function successfully raised error: ", str(excinfo.value))
 
 def test_CholeskyFactorization_Tridiagonal():
     """Test that CholeskyFactorization errors for non-tridiagonal matrices"""
@@ -147,7 +147,7 @@ def test_CholeskyFactorization_Tridiagonal():
     with pytest.raises(RuntimeError) as excinfo:
         Chol.CholeskyFactorization(A)
     assert "Matrix must be tridiagonal" in str(excinfo.value)
-    print("Function successfully raised error: Matrix must be tridiagonal")
+    print("Function successfully raised error: ", str(excinfo.value))
 
 def test_CholeskyFactorization_Square():
     """Test that CholeskyFactorization errors for non-square matrices"""
@@ -166,4 +166,4 @@ def test_CholeskyFactorization_Square():
     with pytest.raises(RuntimeError) as excinfo:
         Chol.CholeskyFactorization(A)
     assert "Matrix must be square" in str(excinfo.value)
-    print("Function successfully raised error: Matrix must be square")
+    print("Function successfully raised error: ", str(excinfo.value))
