@@ -28,9 +28,12 @@ def test_CholeskyFactorization_Correct():
     # tolerance is machine epsilon
     tol = np.finfo(np.float64).eps
 
+    # Set up A matrix
     n = 10
-    A = sp.diags([-1, 2, -1], [-1, 0, 1], shape=(n, n), dtype="d", format="dia")
+    A = sp.diags([-1, 2, -1], [-1, 0, 1], shape=(n, n), dtype=np.double, format="dia")
     print("Matrix A is\n", A.toarray())
+
+    # Run the Cholesky Factorization
     L = Chol.CholeskyFactorization(A)
 
     # Factorization should be in dia format
@@ -57,10 +60,14 @@ def test_CholeskyFactorization_Convert():
     # tolerance is machine epsilon
     tol = np.finfo(np.float64).eps
 
+    # Set up A matrix
     n = 10
-    A = sp.diags([-1, 2, -1], [-1, 0, 1], shape=(n, n), dtype="d", format="dok")
+    A = sp.diags([-1, 2, -1], [-1, 0, 1], shape=(n, n), dtype=np.double, format="dok")
     print("Matrix A is\n", A.toarray())
+
+    # Run the Cholesky Factorization
     L = Chol.CholeskyFactorization(A)
+
     # Factorization should be in dia format
     assert sp.isspmatrix_dia(L)
 
@@ -82,13 +89,16 @@ def test_CholeskyFactorization_Symmetric():
     print("\n-----------------------------------------------------")
     print("Testing that the function throws an error for non-symmetric")
     print("-----------------------------------------------------")
+
+    # Set up A matrix
     offsets = np.array([1, 0, -1])
     main_diag = 4.0*np.ones(4, dtype="double")
     sup_diag = np.array([1, 2, 1], dtype="double")
     sub_diag = np.ones(3, dtype="double")
-    A = sp.diags([sup_diag, main_diag, sub_diag], offsets, shape=(4, 4), dtype="d", format="dia")
+    A = sp.diags([sup_diag, main_diag, sub_diag], offsets, shape=(4, 4), dtype=np.double, format="dia")
     print("Matrix A is\n", A.toarray())
 
+    # check if function throws the correct error
     with pytest.raises(RuntimeError) as excinfo:
         Chol.CholeskyFactorization(A)
     assert "Matrix must be symmetric" in str(excinfo.value)
@@ -99,13 +109,16 @@ def test_CholeskyFactorization_Definite():
     print("\n-----------------------------------------------------")
     print("Testing that the function throws an error for indefinite")
     print("-----------------------------------------------------")
+
+    # Set up A matrix
     offsets = np.array([1, 0, -1])
     main_diag = 4.0*np.ones(4, dtype="double")
     main_diag[2] = 0.5
     sup_diag = np.ones(3, dtype="double")
-    A = sp.diags([sup_diag, main_diag, sup_diag], offsets, shape=(4, 4), dtype="d", format="dia")
+    A = sp.diags([sup_diag, main_diag, sup_diag], offsets, shape=(4, 4), dtype=np.double, format="dia")
     print("Matrix A is\n", A.toarray())
 
+    # check if function throws the correct error
     with pytest.raises(RuntimeError) as excinfo:
         Chol.CholeskyFactorization(A)
     assert "Matrix must be positive definite" in str(excinfo.value)
@@ -116,18 +129,21 @@ def test_CholeskyFactorization_Tridiagonal():
     print("\n-----------------------------------------------------")
     print("Testing that the function throws an error for non-tridiagonal")
     print("-----------------------------------------------------")
+
+    # Set up A matrix
     offsets = np.array([1, 0, -1])
     main_diag = 4.0*np.ones(4, dtype="double")
     sup_diag = np.ones(3, dtype="double")
 
     # Build the matrix in dok format so that we can add two more entries
-    A = sp.diags([sup_diag, main_diag, sup_diag], offsets, shape=(4, 4), dtype="d", format="dok")
+    A = sp.diags([sup_diag, main_diag, sup_diag], offsets, shape=(4, 4), dtype=np.double, format="dok")
     A[1, 3] = A[3, 1] = 1.0
 
     # Now convert to dia
     A = sp.dia_matrix(A)
     print("Matrix A is\n", A.toarray())
 
+    # check if function throws the correct error
     with pytest.raises(RuntimeError) as excinfo:
         Chol.CholeskyFactorization(A)
     assert "Matrix must be tridiagonal" in str(excinfo.value)
@@ -138,12 +154,15 @@ def test_CholeskyFactorization_Square():
     print("\n-----------------------------------------------------")
     print("Testing that the function throws an error for non-square")
     print("-----------------------------------------------------")
+
+    # Set up A matrix
     offsets = np.array([1, 0, -1])
     main_diag = 4.0*np.ones(4, dtype="double")
     sup_diag = np.ones(4, dtype="double") # Can also be used for sub_diag
     A = sp.diags([sup_diag, main_diag, sup_diag], offsets, shape=(4, 5), dtype="d", format="dia")
     print("Matrix A is\n", A.toarray())
 
+    # check if function throws the correct error
     with pytest.raises(RuntimeError) as excinfo:
         Chol.CholeskyFactorization(A)
     assert "Matrix must be square" in str(excinfo.value)

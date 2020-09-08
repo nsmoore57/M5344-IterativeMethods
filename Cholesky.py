@@ -63,6 +63,10 @@ def _isTridiagonal(T):
     Checks to see whether L is tridiagonal.
     L must be in scipy.sparse.dia_matrix form
     """
+    # Make sure the matrix is in dia_matrix format
+    if not sp.isspmatrix_dia(T):
+        raise RuntimeError("Input to _isTridiagonal must be dia_matrix")
+
     # First check if there's 3 diagonals
     if len(T.offsets) != 3:
         return False
