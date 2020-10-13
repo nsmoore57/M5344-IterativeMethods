@@ -59,7 +59,7 @@ end
 plot(x, xinitial, layout=(length(xinitial),1), legend=false)
 
 # ╔═╡ 2b55bab6-08dc-11eb-3f22-21afeaa4ea44
-numJacobiIters = 10000
+numJacobiIters = 1000
 
 # ╔═╡ b9c1a3c4-08db-11eb-2e91-cb4241130b44
 md"Now let's run $numJacobiIters Jacobi iterations on each of these, tracking the error at each iteration."
@@ -160,19 +160,19 @@ md"Imports"
 # ╟─b2f84422-08da-11eb-15b0-ef0e45dab69c
 # ╟─d4dc33ee-07ec-11eb-0bfd-039484b81720
 # ╠═268fd020-08e3-11eb-04b5-37f4a48a1e6e
-# ╟─bedc360e-08da-11eb-29e8-45bc78190706
+# ╠═bedc360e-08da-11eb-29e8-45bc78190706
 # ╟─03b38c4e-07ed-11eb-2200-1b381ca5c349
 # ╟─640fb614-07eb-11eb-25e9-c1501af3e6bb
 # ╟─38a285ec-08db-11eb-3dbf-e52720123bb3
 # ╠═d2e7080e-08da-11eb-1280-4de82702e49d
 # ╟─2846866c-08db-11eb-3287-5784dac4644b
 # ╟─b9c1a3c4-08db-11eb-2e91-cb4241130b44
-# ╟─2b55bab6-08dc-11eb-3f22-21afeaa4ea44
+# ╠═2b55bab6-08dc-11eb-3f22-21afeaa4ea44
 # ╠═2128b458-08dc-11eb-046e-97261b58dd8b
 # ╟─8e751486-08e4-11eb-377b-7b9169d0d51c
 # ╟─fac138a2-08de-11eb-1f75-39183f2801ec
 # ╟─f1915512-08e3-11eb-1e3f-cf0a3a44e916
-# ╟─016ca266-08e4-11eb-18c6-09736686a7e2
+# ╠═016ca266-08e4-11eb-18c6-09736686a7e2
 # ╟─96db8162-08e3-11eb-36ad-6d583ec2234f
 # ╟─8ad57950-0903-11eb-16a4-c30fbf400ff4
 # ╟─77644ac0-0905-11eb-012a-17d36449b91e
@@ -180,16 +180,16 @@ md"Imports"
 # ╠═19fdf6a0-0906-11eb-28ae-7b8f11724e66
 # ╟─d1052080-0906-11eb-14ea-df7dac9a2fd4
 # ╟─6ee2b5d0-0905-11eb-1a06-0f0c81dfe53d
-# ╟─e6efcbd0-090a-11eb-2525-ad2c03d72d22
-# ╟─d5f35ce0-0903-11eb-1ade-a3c30cf8fd71
-# ╟─a2de02f0-0904-11eb-04b8-c5d9412de529
+# ╠═e6efcbd0-090a-11eb-2525-ad2c03d72d22
+# ╠═d5f35ce0-0903-11eb-1ade-a3c30cf8fd71
+# ╠═a2de02f0-0904-11eb-04b8-c5d9412de529
 # ╟─b9631650-0904-11eb-06c1-5b103388af03
-# ╟─ca7a1650-0904-11eb-25bf-87b9b4f006d5
-# ╟─36973de0-0905-11eb-280f-3f2078e12ad5
-# ╟─953c92f0-090a-11eb-023f-6b21d8929ed9
-# ╟─a2a625e0-090b-11eb-03b9-49fd3d6c7caf
-# ╟─83a358b0-090c-11eb-2299-07cd73dcc28c
-# ╟─1f15cf80-090d-11eb-0884-d5c43fb5943d
+# ╠═ca7a1650-0904-11eb-25bf-87b9b4f006d5
+# ╠═36973de0-0905-11eb-280f-3f2078e12ad5
+# ╠═953c92f0-090a-11eb-023f-6b21d8929ed9
+# ╠═a2a625e0-090b-11eb-03b9-49fd3d6c7caf
+# ╠═83a358b0-090c-11eb-2299-07cd73dcc28c
+# ╠═1f15cf80-090d-11eb-0884-d5c43fb5943d
 # ╟─b31d7890-090d-11eb-1928-37873fb68fbe
 # ╟─c5ec024a-07ec-11eb-3868-49c7229e0e7d
 # ╟─812b3720-08e3-11eb-012a-9b0beb675bfb
