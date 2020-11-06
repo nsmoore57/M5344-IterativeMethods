@@ -144,24 +144,24 @@ def GMRES(A, b, maxiters=100, tol=1.0e-6,
         norm_r_k = np.abs(g[k+1])
 
         # Print the current residual
-        print('\titer %4d\tr=%12.5g' %(k, (norm_r_k/norm_b)))
+        # print('\titer %4d\tr=%12.5g' %(k, (norm_r_k/norm_b)))
 
         # Check for convergence
         if (arnoldiBreakdown==True) or (norm_r_k <= tol*norm_b):
-            print('GMRES converged!')
+            # print('GMRES converged!')
             y = la.solve(HBar[0:k+1,0:k+1], g[0:k+1])
             x = precond.applyRight(np.dot(Q[:,0:k+1],y))
             # Compute residual, and compare to implicitly computed
             # residual
             resid = b - mvmult(A,x)
-            print('Implicit residual=%12.5g, true residual=%12.5g'
-                % (norm_r_k/norm_b, la.norm(resid)/norm_b))
-            return (True, x)
+            # print('Implicit residual=%12.5g, true residual=%12.5g'
+                # % (norm_r_k/norm_b, la.norm(resid)/norm_b))
+            return (True, x, k)
 
     # Check for reaching maxiters without convergence
     print('GMRES failed to converge after %g iterations'
             % maxiters)
-    return (False, 0)
+    return (False, 0, maxiters)
 
 
 
@@ -172,8 +172,8 @@ if __name__=='__main__':
 
     rs = RandomState(MT19937(SeedSequence(123456789)))
 
-    level = 18
-    A = mmread('DH-Matrix-%d.mtx' % level)
+    level = 9
+    A = mmread('TestMatrices/DH-Matrix-%d.mtx' % level)
     A = A.tocsr()
     n,nc = A.shape
     print('System is %d by %d' %(n,nc))
@@ -191,18 +191,21 @@ if __name__=='__main__':
 
 
     # Create a preconditioner
-    drop = 1.0e-4
+    drop = 1.0e-0
     print('Creating ILU preconditioner with drop tol = %g' % drop)
     precTimer = MyTimer('ILU creation')
-    ILU = ILURightPreconditioner(A, drop_tol=drop)
+    ILU = ILURightPreconditioner(A, drop_tol=drop, fill_factor=15)
     precTimer.stop()
 
 
     # Run GMRES
     print('Running GMRES')
     gmresTimer = MyTimer('GMRES')
-    (conv,x) = GMRES(A,b,maxiters=500, tol=1.0e-8, precond=ILU)
+    (conv,x,_) = GMRES(A,b,maxiters=500, tol=1.0e-6, precond=ILU)
     gmresTimer.stop()
+
+    # Delete the preconditioner object to save memory for the factorization
+    del ILU
 
     # Print the error
     if conv:

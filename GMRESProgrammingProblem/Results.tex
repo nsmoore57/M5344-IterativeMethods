@@ -1,0 +1,120 @@
+\documentclass[oneside,final]{amsart}  % Add final option when final
+\title{Math 5344 - Programming Problem 2}
+\author{Nicholas Moore}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{mathtools}
+\usepackage[top=1in,bottom=1in,includefoot]{geometry}
+\usepackage[
+pdfauthor={Nicholas Moore},
+pdftitle ={Math 5344},
+pdfkeywords={},
+pdfstartview={FitH},
+bookmarks={true},
+draft={false}   % Change this when final
+]{hyperref}
+
+\newenvironment{myproof}[1][\proofname]{\proof[#1]\mbox{}\\*}{\endproof}
+\newcommand{\sign}{\mathrm{sign}}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+
+% New commands for -=, +=, *=, /=
+\newcommand{\pluseq}{\mathrel{+}=}
+\newcommand{\minuseq}{\mathrel{-}=}
+\newcommand{\timeseq}{\mathrel{*}=}
+\newcommand{\divideeq}{\mathrel{/}=}
+\newcommand{\inv}{^{-1}}
+
+\parskip 12pt           % sets spacing between paragraphs
+% \renewcommand{\baselinestretch}{1.5} 	% Uncomment for 1.5 spacing between lines
+% \renewcommand{\baselinestretch}{2.0}
+\parindent 0pt		  % sets leading space for paragraphs
+
+\allowdisplaybreaks[1]
+
+\begin{document}
+\maketitle
+\section{System Information}
+  \begin{table}[htpb]
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+      \hline
+      \multicolumn{4}{|c|}{\textbf{System: }Nick Moore's Desktop ``NickArch'' }\\
+      \hline
+      \hline
+      \multicolumn{4}{|c|}{\textbf{Software}} \\
+      \hline
+      \textbf{OS} & \textbf{Python version} & \textbf{Numpy version} & \textbf{SciPy version} \\
+      \hline
+      Arch Linux (Kernel 5.8.14) & 3.8.6 & 1.19.4 & 1.5.4 \\
+      \hline
+      \multicolumn{4}{|c|}{\textbf{Processor Information}} \\
+      \hline
+      \multicolumn{2}{|c|}{\textbf{Processor}} & \textbf{Number of Cores} & \textbf{Speed} \\
+      \hline
+      \multicolumn{2}{|c|}{AMD Ryzen 7 3800X} & 8 (16 Threads) & 3.9GHz Base, Boost to 4.5GHz \\
+      \hline
+      \multicolumn{4}{|c|}{\textbf{Memory Information}} \\
+      \hline
+      \multicolumn{2}{|c|}{\textbf{Main RAM}} & \textbf{L2} & \textbf{L3} \\
+      \hline
+      \multicolumn{2}{|c|}{32 GB @ 3000MHz DDR4} & 512KB  per core & 32MB \\
+      \hline
+    \end{tabular}
+  \end{table}
+  \section{Results from DH GMRES}
+
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{10}{|c|}{Matrix: Debye-Huckel \#9}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Size: $289\times289$}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Solver: GMRES}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Preconditioning: ILU right, \texttt{fill\_factor=15}}\tabularnewline
+\hline
+\hline
+\multicolumn{10}{|c|}{Stopping tolerance: $\tau=10^{-6}$}\tabularnewline
+\hline
+\hline
+ & \multicolumn{3}{c|}{Convergence} & \multicolumn{3}{c|}{Iterative solve time} & \multicolumn{3}{c|}{Direct solve}\tabularnewline
+\hline
+Fill drop tolerance  & Iters & $\left\Vert r_{\text{final}}\right\Vert $  & $\left\Vert e\right\Vert $  & Build ILU  & GMRES loop  & total  & $\left\Vert r\right\Vert $ & $\left\Vert e\right\Vert $  & time\tabularnewline
+\hline
+1.0 & 69 & 9.23e-7  & 2.81e-5  & 5.99e-4  & 0.0249  & 0.0255  &  &  & 7.47e-4\tabularnewline
+\hline
+0.1 &  &  &  &  &  &  &  &  & \tabularnewline
+\hline
+0.01 &  &  &  &  &  &  &  &  & \tabularnewline
+\hline
+0.001 &  &  &  &  &  &  &  &  & \tabularnewline
+\hline
+0.0001 &  &  &  &  &  &  &  &  & \tabularnewline
+\hline
+\hline
+\multicolumn{10}{|c|}{Stopping tolerance: $\tau=10^{-8}$}\tabularnewline
+\hline
+\hline
+ & \multicolumn{3}{c|}{Convergence} & \multicolumn{3}{c|}{Iterative solve time} & \multicolumn{3}{c|}{Direct solve }\tabularnewline
+\hline
+Fill drop tolerance  & Iters  & $\left\Vert r_{\text{final}}\right\Vert $  & $\left\Vert e\right\Vert $ & Build ILU  & GMRES loop  & total  & $\left\Vert r\right\Vert $  & $\left\Vert e\right\Vert $  & time\tabularnewline
+\hline
+1.0 &  &  &  &  &  &  &  &  & \tabularnewline
+\hline
+0.1 &  &  &  &  &  &  &  &  & \tabularnewline
+\hline
+0.01  &  &  &  &  &  &  &  &  & \tabularnewline
+\hline
+0.001  &  &  &  &  &  &  &  &  & \tabularnewline
+\hline
+0.0001 &  &  &  &  &  &  &  &  & \tabularnewline
+\hline
+\end{tabular}
+
+
+\end{document}
