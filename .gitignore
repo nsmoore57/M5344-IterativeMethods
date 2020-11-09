@@ -8,6 +8,10 @@
 *.log
 *.synctex.gz
 *.out
+auto/
+
+# Emacs files
+.#*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
