@@ -1,0 +1,677 @@
+\documentclass[oneside,final]{amsart}  % Add final option when final
+\title{Math 5344 - Programming Problem 3}
+\author{Nicholas Moore}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{mathtools}
+\usepackage[top=1in,bottom=1in,includefoot]{geometry}
+\usepackage[
+pdfauthor={Nicholas Moore},
+pdftitle ={Math 5344 - Programming Problem 3},
+pdfkeywords={},
+pdfstartview={FitH},
+bookmarks={true},
+draft={false}   % Change this when final
+]{hyperref}
+
+\newenvironment{myproof}[1][\proofname]{\proof[#1]\mbox{}\\*}{\endproof}
+\newcommand{\sign}{\mathrm{sign}}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+
+% New commands for -=, +=, *=, /=
+\newcommand{\pluseq}{\mathrel{+}=}
+\newcommand{\minuseq}{\mathrel{-}=}
+\newcommand{\timeseq}{\mathrel{*}=}
+\newcommand{\divideeq}{\mathrel{/}=}
+\newcommand{\inv}{^{-1}}
+
+\parskip 12pt           % sets spacing between paragraphs
+% \renewcommand{\baselinestretch}{1.5} 	% Uncomment for 1.5 spacing between lines
+% \renewcommand{\baselinestretch}{2.0}
+\parindent 0pt		  % sets leading space for paragraphs
+
+\allowdisplaybreaks[1]
+
+\begin{document}
+\maketitle
+\section{System Information}
+  \begin{table}[htpb]
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+      \hline
+      \multicolumn{4}{|c|}{\textbf{System: }Nick Moore's Desktop ``NickArch'' }\\
+      \hline
+      \hline
+      \multicolumn{4}{|c|}{\textbf{Software}} \\
+      \hline
+      \textbf{OS} & \textbf{Python version} & \textbf{Numpy version} & \textbf{SciPy version} \\
+      \hline
+      Arch Linux (Kernel 5.8.14) & 3.8.6 & 1.19.4 & 1.5.4 \\
+      \hline
+      \multicolumn{4}{|c|}{\textbf{Processor Information}} \\
+      \hline
+      \multicolumn{2}{|c|}{\textbf{Processor}} & \textbf{Number of Cores} & \textbf{Speed} \\
+      \hline
+      \multicolumn{2}{|c|}{AMD Ryzen 7 3800X} & 8 (16 Threads) & 3.9GHz Base, Boost to 4.5GHz \\
+      \hline
+      \multicolumn{4}{|c|}{\textbf{Memory Information}} \\
+      \hline
+      \multicolumn{2}{|c|}{\textbf{Main RAM}} & \textbf{L2} & \textbf{L3} \\
+      \hline
+      \multicolumn{2}{|c|}{32 GB @ 3000MHz DDR4} & 512KB  per core & 32MB \\
+      \hline
+    \end{tabular}
+  \end{table}
+\section{Results from DH CG}
+
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{10}{|c|}{Matrix: Debye-Huckel \#9}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Size: $289\times289$}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Solver: GMRES}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Preconditioning: ILU right, \texttt{fill\_factor=15}}\tabularnewline
+\hline
+\hline
+\multicolumn{10}{|c|}{Stopping tolerance: $\tau=10^{-6}$}\tabularnewline
+\hline
+\hline
+ & \multicolumn{3}{c|}{Convergence} & \multicolumn{3}{c|}{Iterative solve time} & \multicolumn{3}{c|}{Direct solve}\tabularnewline
+\hline
+Fill drop tol.  & Iters & $\left\Vert r_{\text{final}}\right\Vert $  & $\left\Vert e\right\Vert $  & Build ILU  & GMRES  & total  & $\left\Vert r\right\Vert $ & $\left\Vert e\right\Vert $  & time\tabularnewline
+\hline
+% Please table data here - 1e-06 tolerance
+1       & 68  & 9.23e-07 & 2.81e-05 & 5.91e-4 & 4.69e-2 & 4.75e-2 & 3.62e-16 & 1.38e-14 &   8.32e-4\\
+  \hline
+0.1     & 19  & 9.61e-07 & 2.13e-05 & 6.44e-4 & 1.29e-2 & 1.35e-2 & 3.62e-16 & 1.38e-14 &   8.32e-4\\
+  \hline
+0.01    & 6   & 1.80e-07 & 7.59e-06 & 8.27e-4 & 3.46e-3 & 4.28e-3 & 3.62e-16 & 1.38e-14 &   8.32e-4\\
+  \hline
+0.001   & 2   & 1.49e-07 & 2.66e-06 & 8.17e-4 & 1.05e-3 & 1.86e-3 & 3.62e-16 & 1.38e-14 &   8.32e-4\\
+  \hline
+0.0001  & 1   & 2.70e-07 & 1.68e-05 & 8.08e-4 & 9.42e-4 & 1.75e-3 & 3.62e-16 & 1.38e-14 &   8.32e-4\\
+  \hline
+\hline
+\multicolumn{10}{|c|}{Stopping tolerance: $\tau=10^{-8}$}\tabularnewline
+\hline
+\hline
+ & \multicolumn{3}{c|}{Convergence} & \multicolumn{3}{c|}{Iterative solve time} & \multicolumn{3}{c|}{Direct solve }\tabularnewline
+\hline
+Fill drop tol.  & Iters  & $\left\Vert r_{\text{final}}\right\Vert $  & $\left\Vert e\right\Vert $ & Build ILU  & GMRES  & total  & $\left\Vert r\right\Vert $  & $\left\Vert e\right\Vert $  & time\tabularnewline
+\hline
+% Place table data here - 1e-08 tolerance
+1      & 81  & 6.64e-09 & 6.60e-08 & 5.71e-4 &   0.052 &  0.0526 & 3.62e-16 & 1.38e-14 &   8.32e-4\\
+  \hline
+0.1    & 23  & 1.98e-09 & 8.21e-08 & 7.43e-4 & 4.83e-3 & 5.57e-3 & 3.62e-16 & 1.38e-14 &   8.32e-4\\
+  \hline
+0.01   & 8   & 2.73e-09 & 1.00e-07 & 8.12e-4 & 1.78e-3 & 2.59e-3 & 3.62e-16 & 1.38e-14 &   8.32e-4\\
+  \hline
+0.001  & 3   & 2.42e-10 & 1.75e-09 & 8.13e-4 & 1.15e-3 & 1.96e-3 & 3.62e-16 & 1.38e-14 &   8.32e-4\\
+  \hline
+0.0001 & 2   & 8.05e-11 & 1.55e-09 & 8.23e-4 & 1.04e-3 & 1.86e-3 & 3.62e-16 & 1.38e-14 &   8.32e-4\\
+  \hline
+\end{tabular}
+
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{10}{|c|}{Matrix: Debye-Huckel \#10}\tabularnewline
+\hline
+  \multicolumn{10}{|l|}{Size: $545\times545$}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Solver: GMRES}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Preconditioning: ILU right, \texttt{fill\_factor=15}}\tabularnewline
+\hline
+\hline
+\multicolumn{10}{|c|}{Stopping tolerance: $\tau=10^{-6}$}\tabularnewline
+\hline
+\hline
+ & \multicolumn{3}{c|}{Convergence} & \multicolumn{3}{c|}{Iterative solve time} & \multicolumn{3}{c|}{Direct solve}\tabularnewline
+\hline
+Fill drop tol.  & Iters & $\left\Vert r_{\text{final}}\right\Vert $  & $\left\Vert e\right\Vert $  & Build ILU  & GMRES  & total  & $\left\Vert r\right\Vert $ & $\left\Vert e\right\Vert $  & time\tabularnewline
+\hline
+% Please table data here - 1e-06 tolerance
+1      & 87  & 9.11e-07 & 1.37e-05 & 9.96e-4 &  0.0622 &  0.0632 & 3.46e-16 & 2.95e-14 &   1.45e-3\\
+  \hline
+0.1    & 24  & 7.18e-07 & 3.12e-05 & 1.36e-3 &  0.0377 &  0.0391 & 3.46e-16 & 2.95e-14 &   1.45e-3\\
+  \hline
+0.01   & 8   & 9.22e-07 & 4.22e-05 & 1.66e-3 & 2.59e-3 & 4.26e-3 & 3.46e-16 & 2.95e-14 &   1.45e-3\\
+  \hline
+0.001  & 3   & 8.10e-09 & 2.13e-07 & 1.65e-3 & 1.63e-3 & 3.28e-3 & 3.46e-16 & 2.95e-14 &   1.45e-3\\
+  \hline
+0.0001 & 1   & 3.13e-07 & 1.41e-05 & 1.62e-3 &  0.0013 & 2.92e-3 & 3.46e-16 & 2.95e-14 &   1.45e-3\\
+  \hline
+\hline
+\multicolumn{10}{|c|}{Stopping tolerance: $\tau=10^{-8}$}\tabularnewline
+\hline
+\hline
+ & \multicolumn{3}{c|}{Convergence} & \multicolumn{3}{c|}{Iterative solve time} & \multicolumn{3}{c|}{Direct solve }\tabularnewline
+\hline
+Fill drop tol.  & Iters  & $\left\Vert r_{\text{final}}\right\Vert $  & $\left\Vert e\right\Vert $ & Build ILU  & GMRES  & total  & $\left\Vert r\right\Vert $  & $\left\Vert e\right\Vert $  & time\tabularnewline
+\hline
+% Place table data here - 1e-08 tolerance
+1      & 111 & 7.78e-09 & 2.06e-07 & 1.05e-3 &  0.0766 &  0.0776 & 3.46e-16 & 2.95e-14 &   1.45e-3\\
+  \hline
+0.1    & 29  & 9.15e-09 & 7.93e-07 & 1.34e-3 &  0.0375 &  0.0388 & 3.46e-16 & 2.95e-14 &   1.45e-3\\
+  \hline
+0.01   & 11  & 1.80e-09 & 1.44e-07 & 1.63e-3 & 3.27e-3 &  0.0049 & 3.46e-16 & 2.95e-14 &   1.45e-3\\
+  \hline
+0.001  & 3   & 8.10e-09 & 2.13e-07 & 1.63e-3 & 1.62e-3 & 3.25e-3 & 3.46e-16 & 2.95e-14 &   1.45e-3\\
+  \hline
+0.0001 & 2   & 4.60e-11 & 2.59e-09 & 1.61e-3 & 1.46e-3 & 3.07e-3 & 3.46e-16 & 2.95e-14 &   1.45e-3\\
+  \hline
+\end{tabular}
+
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{10}{|c|}{Matrix: Debye-Huckel \#11}\tabularnewline
+\hline
+  \multicolumn{10}{|l|}{Size: $1089\times1089$}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Solver: GMRES}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Preconditioning: ILU right, \texttt{fill\_factor=15}}\tabularnewline
+\hline
+\hline
+\multicolumn{10}{|c|}{Stopping tolerance: $\tau=10^{-6}$}\tabularnewline
+\hline
+\hline
+ & \multicolumn{3}{c|}{Convergence} & \multicolumn{3}{c|}{Iterative solve time} & \multicolumn{3}{c|}{Direct solve}\tabularnewline
+\hline
+Fill drop tol.  & Iters & $\left\Vert r_{\text{final}}\right\Vert $  & $\left\Vert e\right\Vert $  & Build ILU  & GMRES  & total  & $\left\Vert r\right\Vert $ & $\left\Vert e\right\Vert $  & time\tabularnewline
+\hline
+% Please table data here - 1e-06 tolerance
+1      & 115 & 8.72e-07 & 4.40e-05 & 1.82e-3 &  0.0849 &  0.0867 & 3.64e-16 & 8.78e-15 &   3.14e-3\\
+  \hline
+0.1    & 33  & 8.38e-07 & 1.00e-04 & 2.85e-3 &  0.0418 &  0.0446 & 3.64e-16 & 8.78e-15 &   3.14e-3\\
+  \hline
+0.01   & 11  & 6.29e-07 & 2.97e-05 & 3.53e-3 &  0.0295 &  0.0331 & 3.64e-16 & 8.78e-15 &   3.14e-3\\
+  \hline
+0.001  & 3   & 4.29e-07 & 5.04e-05 & 2.87e-3 & 1.67e-3 & 4.54e-3 & 3.64e-16 & 8.78e-15 &   3.14e-3\\
+  \hline
+0.0001 & 1   & 2.09e-07 & 2.73e-06 & 2.81e-3 & 1.37e-3 & 4.18e-3 & 3.64e-16 & 8.78e-15 &   3.14e-3\\
+  \hline
+\hline
+\multicolumn{10}{|c|}{Stopping tolerance: $\tau=10^{-8}$}\tabularnewline
+\hline
+\hline
+ & \multicolumn{3}{c|}{Convergence} & \multicolumn{3}{c|}{Iterative solve time} & \multicolumn{3}{c|}{Direct solve }\tabularnewline
+\hline
+Fill drop tol.  & Iters  & $\left\Vert r_{\text{final}}\right\Vert $  & $\left\Vert e\right\Vert $ & Build ILU  & GMRES  & total  & $\left\Vert r\right\Vert $  & $\left\Vert e\right\Vert $  & time\tabularnewline
+\hline
+% Place table data here - 1e-08 tolerance
+1      & 157 & 9.78e-09 & 5.68e-07 & 1.40e-3 &   0.106 &   0.107 & 3.64e-16 & 8.78e-15 &   3.14e-3\\
+  \hline
+0.1    & 44  & 7.30e-09 & 2.34e-07 & 2.42e-3 &  0.0313 &  0.0337 & 3.64e-16 & 8.78e-15 &   3.14e-3\\
+  \hline
+0.01   & 15  & 3.37e-09 & 2.94e-07 & 3.02e-3 &  0.0272 &  0.0302 & 3.64e-16 & 8.78e-15 &   3.14e-3\\
+  \hline
+0.001  & 4   & 9.81e-09 & 2.41e-07 & 3.33e-3 &  0.0111 &  0.0145 & 3.64e-16 & 8.78e-15 &   3.14e-3\\
+  \hline
+0.0001 & 2   & 9.70e-11 & 6.81e-09 & 3.10e-3 & 1.53e-3 & 4.62e-3 & 3.64e-16 & 8.78e-15 &   3.14e-3\\
+  \hline
+\end{tabular}
+
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{10}{|c|}{Matrix: Debye-Huckel \#12}\tabularnewline
+\hline
+  \multicolumn{10}{|l|}{Size: $2113\times2113$}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Solver: GMRES}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Preconditioning: ILU right, \texttt{fill\_factor=15}}\tabularnewline
+\hline
+\hline
+\multicolumn{10}{|c|}{Stopping tolerance: $\tau=10^{-6}$}\tabularnewline
+\hline
+\hline
+ & \multicolumn{3}{c|}{Convergence} & \multicolumn{3}{c|}{Iterative solve time} & \multicolumn{3}{c|}{Direct solve}\tabularnewline
+\hline
+Fill drop tol.  & Iters & $\left\Vert r_{\text{final}}\right\Vert $  & $\left\Vert e\right\Vert $  & Build ILU  & GMRES  & total  & $\left\Vert r\right\Vert $ & $\left\Vert e\right\Vert $  & time\tabularnewline
+\hline
+% Please table data here - 1e-06 tolerance
+1      & 154 & 9.47e-07 & 4.56e-05 & 2.73e-3 &   0.161 &   0.164 & 3.89e-16 & 2.31e-14 &   5.61e-3\\
+  \hline
+0.1    & 42  & 7.55e-07 & 1.66e-04 & 5.41e-3 &  0.0872 &  0.0926 & 3.89e-16 & 2.31e-14 &   5.61e-3\\
+  \hline
+0.01   & 15  & 2.70e-07 & 4.30e-05 & 8.27e-3 &  0.0205 &  0.0287 & 3.89e-16 & 2.31e-14 &   5.61e-3\\
+  \hline
+0.001  & 5   & 3.12e-08 & 6.61e-06 & 6.43e-3 & 8.55e-3 &   0.015 & 3.89e-16 & 2.31e-14 &   5.61e-3\\
+  \hline
+0.0001 & 2   & 1.81e-08 & 5.85e-06 & 6.77e-3 & 2.82e-3 & 9.59e-3 & 3.89e-16 & 2.31e-14 &   5.61e-3\\
+  \hline
+\hline
+\multicolumn{10}{|c|}{Stopping tolerance: $\tau=10^{-8}$}\tabularnewline
+\hline
+\hline
+ & \multicolumn{3}{c|}{Convergence} & \multicolumn{3}{c|}{Iterative solve time} & \multicolumn{3}{c|}{Direct solve }\tabularnewline
+\hline
+Fill drop tol.  & Iters  & $\left\Vert r_{\text{final}}\right\Vert $  & $\left\Vert e\right\Vert $ & Build ILU  & GMRES  & total  & $\left\Vert r\right\Vert $  & $\left\Vert e\right\Vert $  & time\tabularnewline
+\hline
+% Place table data here - 1e-08 tolerance
+1      & 212 & 9.64e-09 & 2.51e-06 & 2.62e-3 &   0.267 &    0.27 & 3.89e-16 & 2.31e-14 &   5.61e-3\\
+  \hline
+0.1    & 58  & 6.68e-09 & 1.39e-06 & 5.25e-3 &  0.0673 &  0.0726 & 3.89e-16 & 2.31e-14 &   5.61e-3\\
+  \hline
+0.01   & 20  & 6.63e-09 & 7.06e-07 & 8.01e-3 &  0.0322 &  0.0402 & 3.89e-16 & 2.31e-14 &   5.61e-3\\
+  \hline
+0.001  & 6   & 3.91e-09 & 7.88e-07 & 8.99e-3 &  0.0248 &  0.0338 & 3.89e-16 & 2.31e-14 &   5.61e-3\\
+  \hline
+0.0001 & 3   & 5.77e-11 & 9.54e-09 & 9.06e-3 & 3.19e-3 &  0.0123 & 3.89e-16 & 2.31e-14 &   5.61e-3\\
+  \hline
+\end{tabular}
+
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{10}{|c|}{Matrix: Debye-Huckel \#13}\tabularnewline
+\hline
+  \multicolumn{10}{|l|}{Size: $4225\times4225$}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Solver: GMRES}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Preconditioning: ILU right, \texttt{fill\_factor=15}}\tabularnewline
+\hline
+\hline
+\multicolumn{10}{|c|}{Stopping tolerance: $\tau=10^{-6}$}\tabularnewline
+\hline
+\hline
+ & \multicolumn{3}{c|}{Convergence} & \multicolumn{3}{c|}{Iterative solve time} & \multicolumn{3}{c|}{Direct solve}\tabularnewline
+\hline
+Fill drop tol.  & Iters & $\left\Vert r_{\text{final}}\right\Vert $  & $\left\Vert e\right\Vert $  & Build ILU  & GMRES  & total  & $\left\Vert r\right\Vert $ & $\left\Vert e\right\Vert $  & time\tabularnewline
+\hline
+% Please table data here - 1e-06 tolerance
+1      & 208 & 9.50e-07 & 1.33e-04 & 4.79e-3 &   0.668 &   0.673 & 4.24e-16 & 1.01e-13 &    0.0118\\
+  \hline
+0.1    & 58  & 8.95e-07 & 1.81e-04 &  0.0114 &  0.0883 &  0.0997 & 4.24e-16 & 1.01e-13 &    0.0118\\
+  \hline
+0.01   & 20  & 4.84e-07 & 1.05e-04 &  0.0171 &   0.037 &  0.0541 & 4.24e-16 & 1.01e-13 &    0.0118\\
+  \hline
+0.001  & 6   & 4.16e-07 & 1.57e-04 &  0.0203 &  0.0323 &  0.0526 & 4.24e-16 & 1.01e-13 &    0.0118\\
+  \hline
+0.0001 & 2   & 4.82e-07 & 5.29e-05 &  0.0149 & 7.37e-3 &  0.0223 & 4.24e-16 & 1.01e-13 &    0.0118\\
+  \hline
+\hline
+\multicolumn{10}{|c|}{Stopping tolerance: $\tau=10^{-8}$}\tabularnewline
+\hline
+\hline
+ & \multicolumn{3}{c|}{Convergence} & \multicolumn{3}{c|}{Iterative solve time} & \multicolumn{3}{c|}{Direct solve }\tabularnewline
+\hline
+Fill drop tol.  & Iters  & $\left\Vert r_{\text{final}}\right\Vert $  & $\left\Vert e\right\Vert $ & Build ILU  & GMRES  & total  & $\left\Vert r\right\Vert $  & $\left\Vert e\right\Vert $  & time\tabularnewline
+\hline
+% Place table data here - 1e-08 tolerance
+1      & 251 & 9.65e-09 & 2.46e-06 & 4.89e-3 &   0.923 &   0.928 & 4.24e-16 & 1.01e-13 &    0.0118\\
+  \hline
+0.1    & 82  & 9.08e-09 & 3.85e-06 &  0.0113 &   0.142 &   0.153 & 4.24e-16 & 1.01e-13 &    0.0118\\
+  \hline
+0.01   & 27  & 6.36e-09 & 5.71e-07 &   0.017 &   0.037 &   0.054 & 4.24e-16 & 1.01e-13 &    0.0118\\
+  \hline
+0.001  & 8   & 3.82e-09 & 3.92e-07 &  0.0201 &  0.0146 &  0.0347 & 4.24e-16 & 1.01e-13 &    0.0118\\
+  \hline
+0.0001 & 3   & 7.68e-09 & 1.81e-06 &  0.0218 & 8.98e-3 &  0.0307 & 4.24e-16 & 1.01e-13 &    0.0118\\
+  \hline
+\end{tabular}
+
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{10}{|c|}{Matrix: Debye-Huckel \#14}\tabularnewline
+\hline
+  \multicolumn{10}{|l|}{Size: $8321\times8321$}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Solver: GMRES}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Preconditioning: ILU right, \texttt{fill\_factor=15}}\tabularnewline
+\hline
+\hline
+\multicolumn{10}{|c|}{Stopping tolerance: $\tau=10^{-6}$}\tabularnewline
+\hline
+\hline
+ & \multicolumn{3}{c|}{Convergence} & \multicolumn{3}{c|}{Iterative solve time} & \multicolumn{3}{c|}{Direct solve}\tabularnewline
+\hline
+Fill drop tol.  & Iters & $\left\Vert r_{\text{final}}\right\Vert $  & $\left\Vert e\right\Vert $  & Build ILU  & GMRES  & total  & $\left\Vert r\right\Vert $ & $\left\Vert e\right\Vert $  & time\tabularnewline
+\hline
+% Please table data here - 1e-06 tolerance
+1      & 284 & 9.50e-07 & 5.06e-04 &  0.0148 &    2.32 &    2.33 & 4.44e-16 & 1.43e-13 &    0.0347\\
+  \hline
+0.1    & 79  & 7.73e-07 & 2.21e-04 &  0.0244 &    0.26 &   0.284 & 4.44e-16 & 1.43e-13 &    0.0347\\
+  \hline
+0.01   & 28  & 5.29e-07 & 1.40e-04 &  0.0379 &  0.0764 &   0.114 & 4.44e-16 & 1.43e-13 &    0.0347\\
+  \hline
+0.001  & 8   & 7.05e-07 & 6.44e-05 &   0.049 &  0.0235 &  0.0725 & 4.44e-16 & 1.43e-13 &    0.0347\\
+  \hline
+0.0001 & 3   & 1.35e-07 & 4.36e-05 &  0.0389 &  0.0159 &  0.0549 & 4.44e-16 & 1.43e-13 &    0.0347\\
+  \hline
+\hline
+\multicolumn{10}{|c|}{Stopping tolerance: $\tau=10^{-8}$}\tabularnewline
+\hline
+\hline
+ & \multicolumn{3}{c|}{Convergence} & \multicolumn{3}{c|}{Iterative solve time} & \multicolumn{3}{c|}{Direct solve }\tabularnewline
+\hline
+Fill drop tol.  & Iters  & $\left\Vert r_{\text{final}}\right\Vert $  & $\left\Vert e\right\Vert $ & Build ILU  & GMRES  & total  & $\left\Vert r\right\Vert $  & $\left\Vert e\right\Vert $  & time\tabularnewline
+\hline
+% Place table data here - 1e-08 tolerance
+1      & 346 & 9.62e-09 & 4.75e-06 & 9.66e-3 &    3.39 &     3.4 & 4.44e-16 & 1.43e-13 &    0.0347\\
+  \hline
+0.1    & 104 & 9.20e-09 & 9.38e-06 &  0.0243 &   0.393 &   0.417 & 4.44e-16 & 1.43e-13 &    0.0347\\
+  \hline
+0.01   & 35  & 5.90e-09 & 1.37e-06 &  0.0382 &  0.0914 &    0.13 & 4.44e-16 & 1.43e-13 &    0.0347\\
+  \hline
+0.001  & 11  & 9.15e-09 & 2.85e-06 &  0.0493 &  0.0271 &  0.0764 & 4.44e-16 & 1.43e-13 &    0.0347\\
+  \hline
+0.0001 & 4   & 1.59e-09 & 7.29e-07 &  0.0387 &  0.0266 &  0.0653 & 4.44e-16 & 1.43e-13 &    0.0347\\
+  \hline
+\end{tabular}
+
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{10}{|c|}{Matrix: Debye-Huckel \#15}\tabularnewline
+\hline
+  \multicolumn{10}{|l|}{Size: $16641\times16641$}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Solver: GMRES}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Preconditioning: ILU right, \texttt{fill\_factor=15}}\tabularnewline
+\hline
+\hline
+\multicolumn{10}{|c|}{Stopping tolerance: $\tau=10^{-6}$}\tabularnewline
+\hline
+\hline
+ & \multicolumn{3}{c|}{Convergence} & \multicolumn{3}{c|}{Iterative solve time} & \multicolumn{3}{c|}{Direct solve}\tabularnewline
+\hline
+Fill drop tol.  & Iters & $\left\Vert r_{\text{final}}\right\Vert $  & $\left\Vert e\right\Vert $  & Build ILU  & GMRES  & total  & $\left\Vert r\right\Vert $ & $\left\Vert e\right\Vert $  & time\tabularnewline
+\hline
+% Please table data here - 1e-06 tolerance
+1      & 335 & 9.93e-07 & 2.57e-03 &  0.0288 &    6.19 &    6.22 & 4.77e-16 & 9.31e-14 &     0.105\\
+  \hline
+0.1    & 93  & 9.88e-07 & 1.67e-03 &  0.0485 &   0.586 &   0.635 & 4.77e-16 & 9.31e-14 &     0.105\\
+  \hline
+0.01   & 35  & 9.08e-07 & 1.10e-03 &  0.0803 &   0.153 &   0.234 & 4.77e-16 & 9.31e-14 &     0.105\\
+  \hline
+0.001  & 10  & 9.15e-07 & 5.14e-04 &  0.0945 &  0.0528 &   0.147 & 4.77e-16 & 9.31e-14 &     0.105\\
+  \hline
+0.0001 & 4   & 1.27e-07 & 2.38e-04 &  0.0925 &  0.0622 &   0.155 & 4.77e-16 & 9.31e-14 &     0.105\\
+  \hline
+\hline
+\multicolumn{10}{|c|}{Stopping tolerance: $\tau=10^{-8}$}\tabularnewline
+\hline
+\hline
+ & \multicolumn{3}{c|}{Convergence} & \multicolumn{3}{c|}{Iterative solve time} & \multicolumn{3}{c|}{Direct solve }\tabularnewline
+\hline
+Fill drop tol.  & Iters  & $\left\Vert r_{\text{final}}\right\Vert $  & $\left\Vert e\right\Vert $ & Build ILU  & GMRES  & total  & $\left\Vert r\right\Vert $  & $\left\Vert e\right\Vert $  & time\tabularnewline
+\hline
+% Place table data here - 1e-08 tolerance
+1      & 477 & 9.64e-09 & 2.80e-06 &  0.0188 &    12.4 &    12.4 & 4.77e-16 & 9.31e-14 &     0.105\\
+  \hline
+0.1    & 135 & 9.76e-09 & 2.83e-06 &  0.0472 &    1.19 &    1.23 & 4.77e-16 & 9.31e-14 &     0.105\\
+  \hline
+0.01   & 46  & 9.01e-09 & 1.25e-05 &  0.0751 &   0.234 &   0.309 & 4.77e-16 & 9.31e-14 &     0.105\\
+  \hline
+0.001  & 15  & 3.39e-09 & 1.76e-06 &  0.0921 &  0.0923 &   0.184 & 4.77e-16 & 9.31e-14 &     0.105\\
+  \hline
+0.0001 & 5   & 8.83e-09 & 1.03e-05 &  0.0952 &  0.0412 &   0.136 & 4.77e-16 & 9.31e-14 &     0.105\\
+  \hline
+\end{tabular}
+
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{10}{|c|}{Matrix: Debye-Huckel \#16}\tabularnewline
+\hline
+  \multicolumn{10}{|l|}{Size: $65137\times65137$}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Solver: GMRES}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Preconditioning: ILU right, \texttt{fill\_factor=15}}\tabularnewline
+\hline
+\hline
+\multicolumn{10}{|c|}{Stopping tolerance: $\tau=10^{-6}$}\tabularnewline
+\hline
+\hline
+ & \multicolumn{3}{c|}{Convergence} & \multicolumn{3}{c|}{Iterative solve time} & \multicolumn{3}{c|}{Direct solve}\tabularnewline
+\hline
+Fill drop tol.  & Iters & $\left\Vert r_{\text{final}}\right\Vert $  & $\left\Vert e\right\Vert $  & Build ILU  & GMRES  & total  & $\left\Vert r\right\Vert $ & $\left\Vert e\right\Vert $  & time\tabularnewline
+\hline
+% Please table data here - 1e-06 tolerance
+1      & 468 & 9.97e-07 & 2.20e-02 &   0.102 &    45.1 &    45.2 & 5.40e-16 & 6.52e-13 &     0.806\\
+\hline
+0.1    & 143 & 9.92e-07 & 1.58e-02 &   0.162 &    5.02 &    5.18 & 5.40e-16 & 6.52e-13 &     0.806\\
+\hline
+0.01   & 58  & 9.93e-07 & 1.07e-02 &   0.291 &     1.2 &    1.49 & 5.40e-16 & 6.52e-13 &     0.806\\
+\hline
+0.001  & 20  & 8.34e-07 & 1.76e-03 &   0.395 &   0.417 &   0.812 & 5.40e-16 & 6.52e-13 &     0.806\\
+\hline
+0.0001 & 7   & 3.36e-07 & 3.71e-04 &   0.523 &   0.204 &   0.727 & 5.40e-16 & 6.52e-13 &     0.806\\
+\hline
+\hline
+\multicolumn{10}{|c|}{Stopping tolerance: $\tau=10^{-8}$}\tabularnewline
+\hline
+\hline
+ & \multicolumn{3}{c|}{Convergence} & \multicolumn{3}{c|}{Iterative solve time} & \multicolumn{3}{c|}{Direct solve }\tabularnewline
+\hline
+Fill drop tol.  & Iters  & $\left\Vert r_{\text{final}}\right\Vert $  & $\left\Vert e\right\Vert $ & Build ILU  & GMRES  & total  & $\left\Vert r\right\Vert $  & $\left\Vert e\right\Vert $  & time\tabularnewline
+\hline
+% Place table data here - 1e-08 tolerance
+1      & 760 & 9.66e-09 & 1.43e-05 &  0.0886 &     118 &     118 & 5.40e-16 & 6.52e-13 &     0.806\\
+  \hline
+0.1    & 232 & 9.81e-09 & 2.24e-05 &   0.163 &    12.2 &    12.3 & 5.40e-16 & 6.52e-13 &     0.806\\
+  \hline
+0.01   & 89  & 9.73e-09 & 3.51e-05 &   0.293 &     2.4 &    2.69 & 5.40e-16 & 6.52e-13 &     0.806\\
+  \hline
+0.001  & 26  & 4.03e-09 & 1.31e-06 &   0.399 &   0.506 &   0.905 & 5.40e-16 & 6.52e-13 &     0.806\\
+  \hline
+0.0001 & 9   & 3.59e-09 & 2.97e-06 &   0.526 &   0.245 &   0.771 & 5.40e-16 & 6.52e-13 &     0.806\\
+  \hline
+\end{tabular}
+
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{10}{|c|}{Matrix: Debye-Huckel \#17}\tabularnewline
+\hline
+  \multicolumn{10}{|l|}{Size: $95538\times95538$}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Solver: GMRES}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Preconditioning: ILU right, \texttt{fill\_factor=15}}\tabularnewline
+\hline
+\hline
+\multicolumn{10}{|c|}{Stopping tolerance: $\tau=10^{-6}$}\tabularnewline
+\hline
+\hline
+ & \multicolumn{3}{c|}{Convergence} & \multicolumn{3}{c|}{Iterative solve time} & \multicolumn{3}{c|}{Direct solve}\tabularnewline
+\hline
+Fill drop tol.  & Iters & $\left\Vert r_{\text{final}}\right\Vert $  & $\left\Vert e\right\Vert $  & Build ILU  & GMRES  & total  & $\left\Vert r\right\Vert $ & $\left\Vert e\right\Vert $  & time\tabularnewline
+\hline
+% Please table data here - 1e-06 tolerance
+1      & 521 & 9.98e-07 & 5.50e-02 &   0.173 &    90.1 &    90.3 & 5.23e-16 & 5.62e-13 &      1.41\\
+  \hline
+0.1    & 156 & 9.90e-07 & 3.85e-02 &   0.283 &    9.45 &    9.73 & 5.23e-16 & 5.62e-13 &      1.41\\
+  \hline
+0.01   & 61  & 9.39e-07 & 2.23e-02 &    0.49 &     2.1 &    2.59 & 5.23e-16 & 5.62e-13 &      1.41\\
+  \hline
+0.001  & 21  & 8.82e-07 & 3.62e-03 &   0.639 &   0.706 &    1.35 & 5.23e-16 & 5.62e-13 &      1.41\\
+  \hline
+0.0001 & 7   & 4.36e-07 & 3.53e-04 &   0.845 &   0.306 &    1.15 & 5.23e-16 & 5.62e-13 &      1.41\\
+  \hline
+\hline
+\multicolumn{10}{|c|}{Stopping tolerance: $\tau=10^{-8}$}\tabularnewline
+\hline
+\hline
+ & \multicolumn{3}{c|}{Convergence} & \multicolumn{3}{c|}{Iterative solve time} & \multicolumn{3}{c|}{Direct solve }\tabularnewline
+\hline
+Fill drop tol.  & Iters  & $\left\Vert r_{\text{final}}\right\Vert $  & $\left\Vert e\right\Vert $ & Build ILU  & GMRES  & total  & $\left\Vert r\right\Vert $  & $\left\Vert e\right\Vert $  & time\tabularnewline
+\hline
+% Place table data here - 1e-08 tolerance
+1      & 983 & 9.94e-09 & 3.78e-05 &   0.162 &     318 &     318 & 5.23e-16 & 5.62e-13 &      1.41\\
+  \hline
+0.1    & 295 & 9.98e-09 & 3.83e-05 &   0.275 &    30.8 &    31.1 & 5.23e-16 & 5.62e-13 &      1.41\\
+  \hline
+0.01   & 101 & 9.97e-09 & 2.37e-05 &   0.485 &    4.61 &     5.1 & 5.23e-16 & 5.62e-13 &      1.41\\
+  \hline
+0.001  & 31  & 4.21e-09 & 4.78e-06 &   0.634 &       1 &    1.63 & 5.23e-16 & 5.62e-13 &      1.41\\
+  \hline
+0.0001 & 11  & 7.12e-09 & 1.46e-05 &   0.838 &   0.413 &    1.25 & 5.23e-16 & 5.62e-13 &      1.41\\
+  \hline
+\end{tabular}
+
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{10}{|c|}{Matrix: Debye-Huckel \#18}\tabularnewline
+\hline
+  \multicolumn{10}{|l|}{Size: $197830\times197830$}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Solver: GMRES}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Preconditioning: ILU right, \texttt{fill\_factor=15}}\tabularnewline
+\hline
+\hline
+\multicolumn{10}{|c|}{Stopping tolerance: $\tau=10^{-6}$}\tabularnewline
+\hline
+\hline
+ & \multicolumn{3}{c|}{Convergence} & \multicolumn{3}{c|}{Iterative solve time} & \multicolumn{3}{c|}{Direct solve}\tabularnewline
+\hline
+Fill drop tol.  & Iters & $\left\Vert r_{\text{final}}\right\Vert $  & $\left\Vert e\right\Vert $  & Build ILU  & GMRES  & total  & $\left\Vert r\right\Vert $ & $\left\Vert e\right\Vert $  & time\tabularnewline
+\hline
+% Please table data here - 1e-06 tolerance
+0.01   & 74  & 9.72e-07 & 8.85e-02 &     1.2 &    7.06 &    8.26 & 6.15e-16 & 2.09e-12 &      5.26\\
+  \hline
+0.001  & 29  & 8.54e-07 & 1.54e-02 &    1.66 &    2.19 &    3.86 & 6.15e-16 & 2.09e-12 &      5.26\\
+  \hline
+0.0001 & 83  & 9.49e-07 & 2.31e-03 &    2.21 &    10.7 &    12.9 & 6.15e-16 & 2.09e-12 &      5.26\\
+  \hline
+\hline
+\multicolumn{10}{|c|}{Stopping tolerance: $\tau=10^{-8}$}\tabularnewline
+\hline
+\hline
+ & \multicolumn{3}{c|}{Convergence} & \multicolumn{3}{c|}{Iterative solve time} & \multicolumn{3}{c|}{Direct solve }\tabularnewline
+\hline
+Fill drop tol.  & Iters  & $\left\Vert r_{\text{final}}\right\Vert $  & $\left\Vert e\right\Vert $ & Build ILU  & GMRES  & total  & $\left\Vert r\right\Vert $  & $\left\Vert e\right\Vert $  & time\tabularnewline
+\hline
+% Place table data here - 1e-08 tolerance
+0.01   & 154 & 8.97e-09 & 8.58e-05 &     1.2 &    25.2 &    26.5 & 6.15e-16 & 2.09e-12 &      5.26\\
+  \hline
+0.001  & 47  & 7.07e-09 & 1.00e-05 &    1.66 &    4.01 &    5.67 & 6.15e-16 & 2.09e-12 &      5.26\\
+  \hline
+0.0001 & 133 & 8.91e-09 & 1.26e-05 &    2.17 &    22.4 &    24.6 & 6.15e-16 & 2.09e-12 &      5.26\\
+  \hline
+\end{tabular}
+
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{10}{|c|}{Matrix: Debye-Huckel \#19}\tabularnewline
+\hline
+  \multicolumn{10}{|l|}{Size: $436218\times436218$}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Solver: GMRES}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Preconditioning: ILU right, \texttt{fill\_factor=15}}\tabularnewline
+\hline
+\hline
+\multicolumn{10}{|c|}{Stopping tolerance: $\tau=10^{-6}$}\tabularnewline
+\hline
+\hline
+ & \multicolumn{3}{c|}{Convergence} & \multicolumn{3}{c|}{Iterative solve time} & \multicolumn{3}{c|}{Direct solve}\tabularnewline
+\hline
+Fill drop tol.  & Iters & $\left\Vert r_{\text{final}}\right\Vert $  & $\left\Vert e\right\Vert $  & Build ILU  & GMRES  & total  & $\left\Vert r\right\Vert $ & $\left\Vert e\right\Vert $  & time\tabularnewline
+\hline
+% Please table data here - 1e-06 tolerance
+0.01   & 79  & 9.80e-07 & 4.41e-01 &    2.79 &    20.9 &    23.7 & 5.63e-16 & 5.46e-12 &      13.4\\
+  \hline
+0.001  & 33  & 9.98e-07 & 8.42e-02 &    4.24 &       6 &    10.2 & 5.63e-16 & 5.46e-12 &      13.4\\
+  \hline
+0.0001 & 115 & 9.35e-07 & 1.06e-02 &    5.95 &    45.9 &    51.8 & 5.63e-16 & 5.46e-12 &      13.4\\
+  \hline
+\hline
+\multicolumn{10}{|c|}{Stopping tolerance: $\tau=10^{-8}$}\tabularnewline
+\hline
+\hline
+ & \multicolumn{3}{c|}{Convergence} & \multicolumn{3}{c|}{Iterative solve time} & \multicolumn{3}{c|}{Direct solve }\tabularnewline
+\hline
+Fill drop tol.  & Iters  & $\left\Vert r_{\text{final}}\right\Vert $  & $\left\Vert e\right\Vert $ & Build ILU  & GMRES  & total  & $\left\Vert r\right\Vert $  & $\left\Vert e\right\Vert $  & time\tabularnewline
+\hline
+% Place table data here - 1e-08 tolerance
+0.01   & 171 & 9.80e-09 & 4.12e-04 &    2.85 &      85 &    87.8 & 5.63e-16 & 5.46e-12 &      13.4\\
+  \hline
+0.001  & 63  & 7.72e-09 & 7.10e-05 &    4.24 &    15.7 &      20 & 5.63e-16 & 5.46e-12 &      13.4\\
+  \hline
+0.0001 & 172 & 9.60e-09 & 4.73e-05 &     5.9 &    93.3 &    99.2 & 5.63e-16 & 5.46e-12 &      13.4\\
+  \hline
+\end{tabular}
+
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{10}{|c|}{Matrix: Debye-Huckel \#20}\tabularnewline
+\hline
+  \multicolumn{10}{|l|}{Size: $769494\times769494$}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Solver: GMRES}\tabularnewline
+\hline
+\multicolumn{10}{|l|}{Preconditioning: ILU right, \texttt{fill\_factor=15}}\tabularnewline
+\hline
+\hline
+\multicolumn{10}{|c|}{Stopping tolerance: $\tau=10^{-6}$}\tabularnewline
+\hline
+\hline
+ & \multicolumn{3}{c|}{Convergence} & \multicolumn{3}{c|}{Iterative solve time} & \multicolumn{3}{c|}{Direct solve}\tabularnewline
+\hline
+Fill drop tol.  & Iters & $\left\Vert r_{\text{final}}\right\Vert $  & $\left\Vert e\right\Vert $  & Build ILU  & GMRES  & total  & $\left\Vert r\right\Vert $ & $\left\Vert e\right\Vert $  & time\tabularnewline
+\hline
+% Please table data here - 1e-06 tolerance
+0.01   & 25  & 9.84e-07 & 8.62e-01 &    6.26 &    6.33 &    12.6 & 6.46e-16 & 2.11e-11 &      43.6\\
+  \hline
+0.001  & 36  & 9.33e-07 & 2.30e-01 &    10.8 &    12.1 &      23 & 6.46e-16 & 2.11e-11 &      43.6\\
+  \hline
+0.0001 & 264 & 9.73e-07 & 1.21e-01 &    13.5 &     353 &     367 & 6.46e-16 & 2.11e-11 &      43.6\\
+  \hline
+\hline
+\multicolumn{10}{|c|}{Stopping tolerance: $\tau=10^{-8}$}\tabularnewline
+\hline
+\hline
+ & \multicolumn{3}{c|}{Convergence} & \multicolumn{3}{c|}{Iterative solve time} & \multicolumn{3}{c|}{Direct solve }\tabularnewline
+\hline
+Fill drop tol.  & Iters  & $\left\Vert r_{\text{final}}\right\Vert $  & $\left\Vert e\right\Vert $ & Build ILU  & GMRES  & total  & $\left\Vert r\right\Vert $  & $\left\Vert e\right\Vert $  & time\tabularnewline
+\hline
+% Place table data here - 1e-08 tolerance
+0.01   & 199 & 9.79e-09 & 2.50e-04 &    6.11 &     195 &     201 & 6.46e-16 & 2.11e-11 &      43.6\\
+  \hline
+0.001  & 83  & 9.29e-09 & 2.19e-04 &    10.5 &    43.2 &    53.7 & 6.46e-16 & 2.11e-11 &      43.6\\
+  \hline
+0.0001 & 406 & 9.69e-09 & 3.77e-05 &    13.6 &     801 &     814 & 6.46e-16 & 2.11e-11 &      43.6\\
+  \hline
+\end{tabular}
+
+\section{Analysis}
+\textbf{Question 1: }You're running a sparse direct solver in addition to GMRES.
+For very small systems, the sparse direct solver will be much faster than an iterative solver.
+At what system size do you see ``break even'', where the iterative solver is as fast or faster than the sparse direct solver?
+How does this depend on the preconditioner's drop tolerance?
+How does the accuracy compare between the iterative and direct solvers?
+
+\textbf{Answer: }The ``break even'' size appears to be around $65137\times65137$.
+It does depend on the drop tolerance.
+At the sizes between $65317\times65137$ and $95538\times95538$, lower drop tolerance improves the speed.
+At sizes above, $95538\times95538$, there appears to be a trade-off between the amount of fill and the convergence of GMRES.
+For these larger sizes, a drop tolerance of 0.001 gives the quickest convergence.
+It should also be noted that at a stopping tolerance of 10e-8, the Direct Solve is still faster for problems larger than $197830\times197830$.
+
+In all cases, the direct solve gives a more accurate results, both in term of residuals and errors.
+
+\textbf{Question 2: }What can you say (quantitatively) about conditioning and roundoff in the sparse calculations?
+
+\textbf{Answer: }Even in larger sizes, the direct solver is still able to achieve a residual of around machine epsilon.
+At high fill drop tolerance, the preconditioner performance is much lower since it still requires a large number of iterations, so there is likely some
+roundoff error in the calculations.
+In the cases of lower drop tolerance however, the number of iterations is low and achieves the desired tolerance without any apparent issue.
+
+In larger matrix sizes we see a very high number of iterations required to solve the system for low drop tolerances.
+This could be due either to eliminating too many values in the preconditioner, or a roundoff issue.
+This causes GMRES to take many more iterations and causes a high running time.
+
+\section{Norm Analysis}
+
+
+\end{document}

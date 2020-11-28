@@ -5,9 +5,10 @@ import scipy.sparse as sp
 from scipy.linalg import norm
 from scipy.sparse.linalg import splu
 import scipy.io
-from GMRES import GMRES, mvmult
+from PCG import PCG
 from BasicPreconditioner import *
 from string import Template
+from KrylovUtils import *
 import gc
 
 # Set up random state
@@ -44,28 +45,27 @@ for i in range(9,21):
     for t in tols:
         print(f'\nStopping Tolerance: {t}\n')
 
-
         for d in drops:
             # Build the preconditioner
             startT = time.time()
             ILU = ILURightPreconditioner(A, drop_tol=d, fill_factor=15)
             ILU_time = time.time() - startT
 
-            # Run GMRES
+            # Run CG
             startT = time.time()
-            (conv, x, iters) = GMRES(A, b, maxiters=1000, tol=t, precond=ILU)
-            GMRES_time = time.time() - startT
+            (conv, iters, x) = PCG(A, b, maxiter=1000, tau=t, precond=ILU)
+            CG_time = time.time() - startT
 
             if conv:
                 # get the residual and error
-                resid_GMRES = norm(b - mvmult(A,x))/norm(b)
-                err_GMRES = norm(x - xTrue)/norm(xTrue)
+                resid_CG = norm(b - mvmult(A,x))/norm(b)
+                err_CG = norm(x - xTrue)/norm(xTrue)
             else:
                 # if no converge, then relative error and residual = 1.0
-                resid_GMRES = 1.0
-                err_GMRES = 1.0
+                resid_CG = 1.0
+                err_CG = 1.0
 
-            print(f'{d:g} & {iters} & {resid_GMRES:1.2e} & {err_GMRES:1.2e} & {ILU_time:10.3g} & {GMRES_time:10.3g} & {ILU_time + GMRES_time:10.3g} & {resid_Direct:1.2e} & {err_Direct:1.2e} & {Direct_time:10.3g}\\\\')
+            print(f'{d:g} & {iters} & {resid_CG:1.2e} & {err_CG:1.2e} & {ILU_time:10.3g} & {CG_time:10.3g} & {ILU_time + CG_time:10.3g} & {resid_Direct:1.2e} & {err_Direct:1.2e} & {Direct_time:10.3g}\\\\')
             print('\\hline')
             del ILU
             del x
