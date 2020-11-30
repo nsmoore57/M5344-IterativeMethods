@@ -13,7 +13,11 @@ from BasicPreconditioner import PreconditionerBase, ILURightPreconditioner
 # * RHS b
 # * Maximum number of steps maxiter
 # * Stopping tolerance tau (relative residual)
-def PCG(A, b, maxiter=100, tau=1.0e-8, precond=PreconditionerBase()):
+#
+# Optional Keyword Arguments:
+# * xTrue - the true solution - used for error calculations
+# * printResults - boolean - used to control whether output is printed during execution
+def PCG(A, b, maxiter=100, tau=1.0e-8, precond=PreconditionerBase(),*, xTrue = None, printResults=False):
 
     # Get size of matrix
     n,nc = A.shape
@@ -22,7 +26,7 @@ def PCG(A, b, maxiter=100, tau=1.0e-8, precond=PreconditionerBase()):
     # Check for the trivial case b=0, x=0
     normB = norm(b)
     if normB == 0.0:
-        return (True, np.zeros_like(b))
+        return (True, 0, np.zeros_like(b))
 
     # Initialize the step, residual, and solution vectors
     r = 1.0*b
@@ -33,8 +37,20 @@ def PCG(A, b, maxiter=100, tau=1.0e-8, precond=PreconditionerBase()):
     # We'll use ||b|| for computing relative residuals
     normB = norm(b)
 
-
     uDotR = np.dot(u,r)
+
+    # Lists to hold error information if needed
+    relResid = []
+    relError = []
+
+    # Need to cache the original residual and error if calculating relative errors:
+    if xTrue is not None:
+        twoNorm_r0 = norm(r)
+        en = x - xTrue
+        ANorm_e0 = np.sqrt(mvmult(en.T, mvmult(A,en)))
+
+        relResid.append(1.0)
+        relError.append(1.0)
 
     # Preconditioned CG
     for k in range(maxiter):
@@ -43,8 +59,9 @@ def PCG(A, b, maxiter=100, tau=1.0e-8, precond=PreconditionerBase()):
 
         pTAp = np.dot(p,Ap)
         if pTAp==0.0: # Should never happen
-            print('PCG broke down: (p, Ap)=0')
-            return (False, 0, 0)
+            if printResults:
+                print('PCG broke down: (p, Ap)=0')
+            return (False, 0, 0, [], [])
 
         # calculate step length
         alpha = uDotR/pTAp
@@ -54,11 +71,13 @@ def PCG(A, b, maxiter=100, tau=1.0e-8, precond=PreconditionerBase()):
         u = precond.applyRight(r)
 
         normR = norm(r)
-        # print('\titer=%4d\t||r||=%12.5g' % (k, normR/normB) )
+        if printResults:
+            print('\titer=%4d\t||r||=%12.5g' % (k, normR/normB) )
 
         if normR <= tau*normB:
-            # print('PCG Converged!')
-            return (True, k+1, x)
+            if printResults:
+                print('PCG Converged!')
+            return (True, k+1, x, relResid, relError)
 
         newUDotR = np.dot(u,r)
         beta = newUDotR/uDotR
@@ -66,8 +85,14 @@ def PCG(A, b, maxiter=100, tau=1.0e-8, precond=PreconditionerBase()):
 
         p = u + beta*p
 
+        if xTrue is not None:
+            relResid.append(normR/twoNorm_r0)
+            en = x - xTrue
+            relError.append(np.sqrt(mvmult(en.T, mvmult(A,en)))/ANorm_e0)
+
+
     # Failure to converge.
-    return (False, maxiter, x)
+    return (False, maxiter, x, relResid, relError)
 
 
 if __name__=='__main__':
