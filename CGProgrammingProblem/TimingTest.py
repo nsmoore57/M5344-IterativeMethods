@@ -16,7 +16,7 @@ import gc
 rs = RandomState(MT19937(SeedSequence(123456789)))
 
 # testMatrices = [6, 10, 12, 14, 15]
-testMatrices = [16]
+testMatrices = [6, 10, 12, 14, 16, 18, 20]
 
 # Run unpreconditioned CG on the matrices, collecting the results for relative Residual and relative Error
 for (i,m) in enumerate(testMatrices):
@@ -24,12 +24,6 @@ for (i,m) in enumerate(testMatrices):
     A = scipy.io.mmread(f'../TestMatrices/DH-Matrix-{m}.mtx')
     A = A.tocsr()
     print(f'Matrix {m}')
-
-    # Get the condition number
-    # DenseTimer = MyTimer('Dense')
-    # condNumActual = np.linalg.cond(A.todense())
-    # DenseTimer.stop()
-    # print(f'Actual: {condNumActual} in {DenseTimer.walltime()}')
 
     # Get the largest and smallest e-val
     RatioTimer = MyTimer('Ratio')

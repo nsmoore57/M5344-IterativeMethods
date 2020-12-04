@@ -26,7 +26,7 @@ def PCG(A, b, maxiter=100, tau=1.0e-8, precond=PreconditionerBase(),*, xTrue = N
     # Check for the trivial case b=0, x=0
     normB = norm(b)
     if normB == 0.0:
-        return (True, 0, np.zeros_like(b))
+        return (True, 0, np.zeros_like(b), [], [])
 
     # Initialize the step, residual, and solution vectors
     r = 1.0*b
