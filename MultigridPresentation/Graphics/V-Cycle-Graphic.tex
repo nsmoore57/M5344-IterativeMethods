@@ -1,0 +1,23 @@
+\documentclass{standalone}
+
+\usepackage{tikz}
+\begin{document}
+\begin{tikzpicture}
+  \filldraw (0, 0) circle (.02in);
+  \filldraw (-0.5, 1) circle (.02in);
+  \filldraw (0.5, 1) circle (.02in);
+  \filldraw (-1, 2) circle (.02in);
+  \filldraw (1, 2) circle (.02in);
+  \filldraw (-1.5, 3) circle (0.02in);
+  \filldraw (1.5, 3) circle (0.02in);
+  \filldraw (-2, 4) circle (0.02in);
+  \filldraw (2, 4) circle (0.02in);
+  \draw[thick] (-2, 4) -- (0,0);
+  \draw[thick] (2, 4) -- (0,0);
+  \node at (2.5, 4)  {$\Omega^h$};
+  \node at (2.5, 3)  {$\Omega^{2h}$};
+  \node at (2.5, 2)  {$\Omega^{4h}$};
+  \node at (2.5, 1)  {$\Omega^{8h}$};
+  \node at (2.5, 0)  {$\Omega^{16h}$};
+\end{tikzpicture}
+\end{document}
