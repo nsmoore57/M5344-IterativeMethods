@@ -377,37 +377,6 @@ solver for the 1D Poisson problem, though the concepts and ideas can be
 applied to problems of higher dimension, or as a preconditioner instead
 of a solver.
 
-    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
-\prompt{In}{incolor}{1}{\boxspacing}
-\begin{Verbatim}[commandchars=\\\{\}]
-\PY{k+kn}{from} \PY{n+nn}{prettytable} \PY{k+kn}{import} \PY{n}{PrettyTable}
-\PY{k+kn}{from} \PY{n+nn}{IPython}\PY{n+nn}{.}\PY{n+nn}{display} \PY{k+kn}{import} \PY{n}{HTML}
-\PY{k+kn}{import} \PY{n+nn}{time}
-\PY{k+kn}{import} \PY{n+nn}{numpy} \PY{k}{as} \PY{n+nn}{np}
-\PY{k+kn}{from} \PY{n+nn}{numpy}\PY{n+nn}{.}\PY{n+nn}{linalg} \PY{k+kn}{import} \PY{n}{norm}\PY{p}{,} \PY{n}{solve}
-\PY{k+kn}{import} \PY{n+nn}{scipy}\PY{n+nn}{.}\PY{n+nn}{sparse} \PY{k}{as} \PY{n+nn}{sp}
-\PY{k+kn}{import} \PY{n+nn}{scipy}\PY{n+nn}{.}\PY{n+nn}{sparse}\PY{n+nn}{.}\PY{n+nn}{linalg} \PY{k}{as} \PY{n+nn}{splu}
-\PY{k+kn}{import} \PY{n+nn}{matplotlib}\PY{n+nn}{.}\PY{n+nn}{pyplot} \PY{k}{as} \PY{n+nn}{plt}
-\PY{k+kn}{from} \PY{n+nn}{numpy}\PY{n+nn}{.}\PY{n+nn}{random} \PY{k+kn}{import} \PY{n}{MT19937}\PY{p}{,} \PY{n}{RandomState}\PY{p}{,} \PY{n}{SeedSequence}
-\PY{n}{rs} \PY{o}{=} \PY{n}{RandomState}\PY{p}{(}\PY{n}{MT19937}\PY{p}{(}\PY{n}{SeedSequence}\PY{p}{(}\PY{l+m+mi}{123456789}\PY{p}{)}\PY{p}{)}\PY{p}{)}
-
-\PY{c+c1}{\PYZsh{} We will be profiling code later, this extension allows line\PYZhy{}by\PYZhy{}line profiling}
-\PY{o}{\PYZpc{}}\PY{k}{load\PYZus{}ext} line\PYZus{}profiler
-
-
-\PY{c+c1}{\PYZsh{} Unified mvmult user interface for both scipy.sparse and numpy matrices.}
-\PY{c+c1}{\PYZsh{} In scipy.sparse, mvmult is done using the overloaded * operator, e.g., A*x.}
-\PY{c+c1}{\PYZsh{} In numpy, mvmult is done using the dot() function, e.g., dot(A,x).}
-\PY{c+c1}{\PYZsh{} This function chooses which to use based on whether A is stored as}
-\PY{c+c1}{\PYZsh{} a sparse matrix.}
-\PY{k}{def} \PY{n+nf}{mvmult}\PY{p}{(}\PY{n}{A}\PY{p}{,} \PY{n}{x}\PY{p}{)}\PY{p}{:}
-    \PY{k}{if} \PY{n}{sp}\PY{o}{.}\PY{n}{issparse}\PY{p}{(}\PY{n}{A}\PY{p}{)}\PY{p}{:}
-        \PY{k}{return} \PY{n}{A}\PY{o}{*}\PY{n}{x}
-    \PY{k}{else}\PY{p}{:}
-        \PY{k}{return} \PY{n}{np}\PY{o}{.}\PY{n}{dot}\PY{p}{(}\PY{n}{A}\PY{p}{,}\PY{n}{x}\PY{p}{)}
-\end{Verbatim}
-\end{tcolorbox}
-
     \hypertarget{analyzing-the-jacobi-method}{%
 \section{Analyzing the Jacobi
 Method}\label{analyzing-the-jacobi-method}}
@@ -416,7 +385,7 @@ Method}\label{analyzing-the-jacobi-method}}
 \subsection{Problem Set Up}\label{problem-set-up}}
 
 First, we create the A matrix. For simplicity and easy of understanding,
-we will choose the 1D poisson problem with Dirichlet Bondary Conditions.
+we will choose the 1D Poisson problem with Dirichlet Boundary Conditions.
 
 The matrix for this problem is given by \[
 A = \frac{1}{h^2}
@@ -432,11 +401,9 @@ A = \frac{1}{h^2}
 of subintervals we divide the domain into, then this matrix is
 \(N-1 \times N-1\).
 
-For the sake of demonstration, we let the right-hand side vector \(b\)
-correspond to the case of Dirichlet boundary conditions where both ends
-are held at \(0\). We choose this because the true solution is therefore
-the zero vector so the error corresponds exactly with the current
-iterate.
+For the sake of demonstration, we let the right-hand side vector \(b = 0\). We
+choose this because the true solution is therefore the zero vector so the error
+corresponds exactly with the current iterate.
 
     \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
 \prompt{In}{incolor}{21}{\boxspacing}
@@ -455,14 +422,13 @@ iterate.
 \end{tcolorbox}
 
     We also generate some initial guesses (which are also initial errors)
-which are sine waves with varying frequencies.
+as sine waves with varying frequencies.
 
     \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
 \prompt{In}{incolor}{22}{\boxspacing}
 \begin{Verbatim}[commandchars=\\\{\}]
 \PY{n}{x} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{linspace}\PY{p}{(}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{,}\PY{n}{N}\PY{o}{+}\PY{l+m+mi}{1}\PY{p}{)}
 \PY{n}{waveNumbers} \PY{o}{=} \PY{p}{[}\PY{l+m+mi}{1}\PY{p}{,} \PY{l+m+mi}{3}\PY{p}{,} \PY{l+m+mi}{10}\PY{p}{,} \PY{l+m+mi}{20}\PY{p}{,} \PY{l+m+mi}{50}\PY{p}{,} \PY{l+m+mi}{100}\PY{p}{]}
-\PY{c+c1}{\PYZsh{}waveNumbers = [1, 10, 50, 100]}
 \PY{n}{xinitial} \PY{o}{=} \PY{p}{[}\PY{n}{np}\PY{o}{.}\PY{n}{sin}\PY{p}{(}\PY{n}{w}\PY{o}{*}\PY{n}{np}\PY{o}{.}\PY{n}{pi}\PY{o}{*}\PY{n}{x}\PY{p}{)} \PY{k}{for} \PY{n}{w} \PY{o+ow}{in} \PY{n}{waveNumbers}\PY{p}{]}
 \PY{n}{fig}\PY{p}{,} \PY{n}{axs} \PY{o}{=} \PY{n}{plt}\PY{o}{.}\PY{n}{subplots}\PY{p}{(}\PY{n+nb}{len}\PY{p}{(}\PY{n}{waveNumbers}\PY{p}{)}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{)}
 \PY{k}{for} \PY{p}{(}\PY{n}{i}\PY{p}{,}\PY{n}{p}\PY{p}{)} \PY{o+ow}{in} \PY{n+nb}{enumerate}\PY{p}{(}\PY{n}{xinitial}\PY{p}{)}\PY{p}{:}
@@ -572,7 +538,7 @@ error than low frequency error.
     \hypertarget{other-iteration-methods}{%
 \subsection{Other Iteration Methods}\label{other-iteration-methods}}
 
-While the preceeding discussion uses Jacobi iteration, all
+While the preceding discussion uses Jacobi iteration, all
 relaxation-type iterations methods like Gauss-Seidel and variations of
 Jacobi and Gauss-Seidel also present this property. In multigrid
 terminology, these are all generally referred to as relaxations.
@@ -581,7 +547,7 @@ terminology, these are all generally referred to as relaxations.
 \subsection{How Do We Use This?}\label{how-do-we-use-this}}
 
 The matrix system does not have any explicit information about the
-phyiscal structure of the problem. Hence, if we take a longer vector
+physical structure of the problem. Hence, if we take a longer vector
 with low frequency error, and remove half of the points:
 
     \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
@@ -667,7 +633,7 @@ to indicate there is any advantage to choosing a different ratio.
 
 First, let's talk about an operator for transforming from the fine grid
 to the coarse grid. This is typically referred to as the
-\textbf{restriction} operator. We will denote is as \(I_h^{2h}\) and
+\textbf{restriction} operator. We will denote it as \(I_h^{2h}\) and
 there are a few reasonable options for how to build this operator. One
 option is to simply remove half of the grid points. This option could
 work, but tends to remove too much information. The more recommended
@@ -695,7 +661,7 @@ representation for weighted averages of geometric nodes) given by \[
 \frac{1}{4} \begin{bmatrix} 1 & 2 & 1 \end{bmatrix}
 \]
 
-This opreator also has another advantage that we'll mention later.
+This operator also has another advantage that we'll mention later.
 
     \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
 \prompt{In}{incolor}{8}{\boxspacing}
@@ -767,17 +733,6 @@ This opreator also has another advantage that we'll mention later.
     \end{center}
     { \hspace*{\fill} \\}
     
-    While, for simplicity in presentation, we will not be presenting a 2D
-problem, the stencil for the full weighting operator in this case is
-given: \[
-\frac{1}{16}
-\begin{bmatrix}
-1 & 2 & 1 \\
-2 & 4 & 2 \\
-1 & 2 & 1
-\end{bmatrix}
-\]
-
     \hypertarget{interpolation-operator}{%
 \subsection{Interpolation Operator}\label{interpolation-operator}}
 
@@ -789,7 +744,7 @@ according to the rule \(I_{2h}^h x^{2h} = x^{h}\) where \begin{align*}
 x_{2j}^h &= x_j^{2h} \\
 x_{2j+1}^h &= \frac{1}{2} \left( x_j^{2h} + x_{j+1}^{2h} \right)
 \end{align*} In other words, for the shared grid points, we simply let
-the values coinside and for the additional fine grid points, we use the
+the values coincide and for the additional fine grid points, we use the
 average of the surrounding coarse grid points. We can describe this
 transformation with a matrix operator. For example, if we have 8
 subintervals in our fine grid (that is 7 interior nodes), and 4
@@ -1086,7 +1041,7 @@ Jacobi before and after the transfer to the coarse grid.
 since we are actually cheating a little bit by using Conjugate Gradient
 on the coarse level. There is some hope, however, looking at the last
 two rows. The run that completes more relaxation and few CG solves
-acheives the same error in half the time. Let's see how long it takes CG
+achieves the same error in half the time. Let's see how long it takes CG
 to solve the fine grid problem to the same relative residual and try
 using more relaxations for the Two Grid method.
 
@@ -1132,7 +1087,7 @@ fine grid to refine that solution. Still, there's more we can do to make
 this better. If you look at step 3 in the algorithm above, you'll notice
 we do a linear system solve on the coarse grid, but this solve is also
 of the form \(Ax = b\). That means we could apply this process
-\textbf{recursively} which is where the real power of Multigrid appears.
+\textbf{recursively} which is where the real power of multigrid appears.
 
     \hypertarget{typical-multigrid-cycles}{%
 \section{Typical Multigrid Cycles}\label{typical-multigrid-cycles}}
@@ -1345,7 +1300,7 @@ to see all the results together:
 
     
     Finally, let's run some extra iterations to see what the convergence
-looks like. Since the code below interupts the V-Cycle function after
+looks like. Since the code below interrupts the V-Cycle function after
 every V-Cycle, we are doing extra work and so the timings are not
 representative, hence we won't calculate them.
 
@@ -1448,7 +1403,7 @@ restriction and prolongation operators for non-uniform meshes where the
 number of bordering nodes is variable. It's also less useful for systems
 with more than one state variable, since only the physical dimensions
 can be made coarser. Instead, we will use the same idea to develop a
-multigrid method that doesn't explicity depend on the mesh, but instead
+multigrid method that doesn't explicitly depend on the mesh, but instead
 depends on the coefficient matrix.
 
 If we look at our matrix \[
@@ -1466,7 +1421,7 @@ matrix corresponds to its level of contribution in calculating the
 element on the diagonal. For example, row 2 has \(-1/h^2\), \(2/h^2\),
 and \(-1/h^2\) in the first three columns. This signifies that only
 \(x_1, x_2, x_3\) directly contribute to the node \(x_2\), with the
-value \(x_2\) contributing more than \(x_1\) and \(x_3\). In algebriac
+value \(x_2\) contributing more than \(x_1\) and \(x_3\). In algebraic
 multigrid, we use this idea of ``significance'' to determine which
 unknowns can be ``merged'' to obtain a coarse matrix. This process will
 also create prolongation and restriction operators which only depend on
