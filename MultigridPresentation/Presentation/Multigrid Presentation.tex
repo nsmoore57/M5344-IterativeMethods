@@ -109,6 +109,18 @@
 
   Jacobi iteration is much better at eliminating high frequency error than low frequency error.
 \end{frame}
+\begin{frame}{Other Iteration Methods}
+  While the preceding discussion uses Jacobi iteration, this property is
+  demonstrated by all ``relaxation-type'' iteration methods like:
+  \begin{itemize}
+    \item Jacobi (and its variations)
+    \item Gauss-Seidel (and its variations)
+    \item SOR
+    \item Block versions of Jacobi and Gauss-Seidel
+  \end{itemize}
+  In multigrid terminology, we generally refer to iterations of these methods
+  as relaxations.
+\end{frame}
 \begin{frame}{How Do We Use This?}
   Notice what happens if we start with a low frequency wave and approximate it
   with half as many points:
@@ -149,7 +161,7 @@
   \item Re-write the matrix system
     \begin{align*}
       A^h(x^h + e^h) &= b^h \\
-      b^h - A^hx^h &= A^he^h = r^h
+      A^he^h &= b^h - A^hx^h = r^h
     \end{align*}
   \item On a coarser grid to solve $A^{2h}e^{2h} = r^{2h}$ and use that solution
     to estimate $e^h$
@@ -270,79 +282,79 @@
   \item With full weighting on 1D, both options are the same
   \end{itemize}
 \end{frame}
-\begin{frame}{Galerkin Projection}
-  First, let \(e_j^{2h}\) denote the vector on the coarse grid with a 1 in
-  the \(j\)th entry, and zeros elsewhere. Then \(A^{2h}e_j^{2h} = I_h^{2h}A^{h}I^h_{2h}e_j^{2h}\) will be
-  the \(j\)th column of \(A^{2h}\). We will calculate this column in
-  steps: \[
-    I_{2h}^{h}e_j^{2h} =
-    \frac{1}{2}
-    \begin{bmatrix}
-      1 &   &   & \\
-      2 &   &   & \\
-      1 & 1 &   & \\
-      & 2 &   & \\
-      & 1 & 1 & \\
-      &   & 2 & \\
-      &   & 1 & \ddots \\
-      &   &   & \ddots \\
-      &   &   & \ddots
-    \end{bmatrix}
-    \begin{bmatrix}
-      0 \\ \vdots \\ 0 \\ 1 \\ 0 \\ \vdots \\ 0
-    \end{bmatrix}
-    =
-    \begin{bmatrix}
-      0 \\ \vdots \\ 0 \\ \frac{1}{2} \\ 1 \\ \frac{1}{2} \\ 0 \\ \vdots \\ 0
-    \end{bmatrix}
-  \]
-\end{frame}
-\begin{frame}{Galerkin Projection}
-  Notice, this vector now lies in the fine grid so we can now apply the
-  fine grid operator \(A^h\) to this vector:
-  \begin{equation*}
-    A^h I_{2h}^h e_j^{2h} =
-    \frac{1}{h^2}
-    \begin{bmatrix}
-      2 & -1  &    &    & \\
-      -1 & 2  & -1 &    & \\
-      & -1 & 2  & -1 &  \\
-      &    & \ddots & \ddots & \ddots
-    \end{bmatrix}
-    \begin{bmatrix}
-      0 \\ \vdots \\ 0 \\ \frac{1}{2} \\ 1 \\ \frac{1}{2} \\ 0 \\ \vdots \\ 0
-    \end{bmatrix} 
-    = \begin{bmatrix}
-      0 \\ \vdots \\ 0 \\ \frac{-1}{2h^2} \\ 0 \\ \frac{1}{h^2} \\ 0 \\ \frac{-1}{2h^2} \\ 0 \\ \vdots \\ 0
-    \end{bmatrix}
-  \end{equation*}
-\end{frame}
-\begin{frame}{Galerkin Projection}
-  Finally, we apply the restriction operator to this vector to obtain a vector in the course grid space: \[
-    I_{h}^{2h} A^{h} I_{2h}^h e_j^{2h} = \frac{1}{4}
-    \begin{bmatrix}
-      1 & 2 & 1 & & & & & & \\
-      & & 1 & 2 & 1 & & & &  \\
-      & & & & 1 & 2 & 1 & &  \\
-      & & & &             &             & \ddots          & \ddots & \ddots \\
-    \end{bmatrix}
-    \begin{bmatrix}
-      0 \\ \vdots \\ 0 \\ \frac{-1}{2h^2} \\ 0 \\ \frac{1}{h^2} \\ 0 \\ \frac{-1}{2h^2} \\ 0 \\ \vdots \\ 0
-    \end{bmatrix}
-    =
-    \begin{bmatrix}
-      0 \\ \vdots \\ 0 \\ \frac{-1}{4h^2} \\ \frac{1}{2h^2} \\ \frac{-1}{4h^2} \\ 0 \\ \vdots \\ 0
-    \end{bmatrix}
-  \] Notice that this is exactly the same column we obtain from creating discretization on the coarse grid.
-\end{frame}
-\begin{frame}{Galerkin Projection}
-  This projection will not be the same
-  as the coarse grid discretization in a 2D problem or if full weighting
-  is not used. Nevertheless, it is a common practice and has been shown to
-  produce good results. It also has the advantage that it requires no
-  extra effort on the part of the user, it can simply be another step in
-  the algorithm.
-\end{frame}
+% \begin{frame}{Galerkin Projection}
+%   First, let \(e_j^{2h}\) denote the vector on the coarse grid with a 1 in
+%   the \(j\)th entry, and zeros elsewhere. Then \(A^{2h}e_j^{2h} = I_h^{2h}A^{h}I^h_{2h}e_j^{2h}\) will be
+%   the \(j\)th column of \(A^{2h}\). We will calculate this column in
+%   steps: \[
+%     I_{2h}^{h}e_j^{2h} =
+%     \frac{1}{2}
+%     \begin{bmatrix}
+%       1 &   &   & \\
+%       2 &   &   & \\
+%       1 & 1 &   & \\
+%       & 2 &   & \\
+%       & 1 & 1 & \\
+%       &   & 2 & \\
+%       &   & 1 & \ddots \\
+%       &   &   & \ddots \\
+%       &   &   & \ddots
+%     \end{bmatrix}
+%     \begin{bmatrix}
+%       0 \\ \vdots \\ 0 \\ 1 \\ 0 \\ \vdots \\ 0
+%     \end{bmatrix}
+%     =
+%     \begin{bmatrix}
+%       0 \\ \vdots \\ 0 \\ \frac{1}{2} \\ 1 \\ \frac{1}{2} \\ 0 \\ \vdots \\ 0
+%     \end{bmatrix}
+%   \]
+% \end{frame}
+% \begin{frame}{Galerkin Projection}
+%   Notice, this vector now lies in the fine grid so we can now apply the
+%   fine grid operator \(A^h\) to this vector:
+%   \begin{equation*}
+%     A^h I_{2h}^h e_j^{2h} =
+%     \frac{1}{h^2}
+%     \begin{bmatrix}
+%       2 & -1  &    &    & \\
+%       -1 & 2  & -1 &    & \\
+%       & -1 & 2  & -1 &  \\
+%       &    & \ddots & \ddots & \ddots
+%     \end{bmatrix}
+%     \begin{bmatrix}
+%       0 \\ \vdots \\ 0 \\ \frac{1}{2} \\ 1 \\ \frac{1}{2} \\ 0 \\ \vdots \\ 0
+%     \end{bmatrix} 
+%     = \begin{bmatrix}
+%       0 \\ \vdots \\ 0 \\ \frac{-1}{2h^2} \\ 0 \\ \frac{1}{h^2} \\ 0 \\ \frac{-1}{2h^2} \\ 0 \\ \vdots \\ 0
+%     \end{bmatrix}
+%   \end{equation*}
+% \end{frame}
+% \begin{frame}{Galerkin Projection}
+%   Finally, we apply the restriction operator to this vector to obtain a vector in the course grid space: \[
+%     I_{h}^{2h} A^{h} I_{2h}^h e_j^{2h} = \frac{1}{4}
+%     \begin{bmatrix}
+%       1 & 2 & 1 & & & & & & \\
+%       & & 1 & 2 & 1 & & & &  \\
+%       & & & & 1 & 2 & 1 & &  \\
+%       & & & &             &             & \ddots          & \ddots & \ddots \\
+%     \end{bmatrix}
+%     \begin{bmatrix}
+%       0 \\ \vdots \\ 0 \\ \frac{-1}{2h^2} \\ 0 \\ \frac{1}{h^2} \\ 0 \\ \frac{-1}{2h^2} \\ 0 \\ \vdots \\ 0
+%     \end{bmatrix}
+%     =
+%     \begin{bmatrix}
+%       0 \\ \vdots \\ 0 \\ \frac{-1}{4h^2} \\ \frac{1}{2h^2} \\ \frac{-1}{4h^2} \\ 0 \\ \vdots \\ 0
+%     \end{bmatrix}
+%   \] Notice that this is exactly the same column we obtain from creating discretization on the coarse grid.
+% \end{frame}
+% \begin{frame}{Galerkin Projection}
+%   This projection will not be the same
+%   as the coarse grid discretization in a 2D problem or if full weighting
+%   is not used. Nevertheless, it is a common practice and has been shown to
+%   produce good results. It also has the advantage that it requires no
+%   extra effort on the part of the user, it can simply be another step in
+%   the algorithm.
+% \end{frame}
 \begin{frame}{Formal Two-Grid Cycle}
   (in Briggs, this is called a Coarse Grid Correction Scheme)
   \begin{enumerate}
@@ -590,6 +602,15 @@ def VCycle(A_fine, b, numPreRelax, numPostRelax, coarsest_N, numiters=1):
     \item Coarse grid solver
     \item Number of relaxations (typically 3-5 pre and post)
     \item Cycle to use (V-Cycle is most common)
+    \end{itemize}
+  \end{frame}
+  \begin{frame}{Cons of Multigrid}
+    \begin{itemize}
+      \item More memory requirements - all coarse matrices need to be stored at
+        once
+      \item Often mitigated by the fact that matrix dimensions decrease
+        exponentially
+      \item Not effective for smaller matrices - need a large system
     \end{itemize}
   \end{frame}
   \begin{frame}{Algebraic Multigrid}
