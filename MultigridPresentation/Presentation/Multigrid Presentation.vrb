@@ -1,0 +1,33 @@
+\frametitle{V-Cycle}
+Here is the code - it's an adapted version of the Two-Grid above
+\begin{lstlisting}[language=Python]
+def VCycle(A_fine, b, numPreRelax, numPostRelax, coarsest_N, numiters=1):
+    N = A_fine.shape[0]
+    I_Restrict = BuildFullWeighting(N)
+    I_Prolong = 2*I_Restrict.T
+
+    A_coarse = I_Restrict.dot(A_fine.dot(I_Prolong))
+    N_coarse = A_coarse.shape[0]
+
+    for i in range(numiters):
+        # First we relax on the fine grid:
+        x = Jacobi(x, A_fine, b, numiters=numPreRelax)
+
+        # Now compute the restricted residual
+        r_coarse = mvmult(I_Restrict, b - mvmult(A_fine, x))
+
+        # If not on the "bottom of the V", we call recursively
+        if N_coarse > coarsest_N:
+            # only 1 iteration to get the V-Cycle
+            e_coarse = VCycle(A_coarse, r_coarse, numPreRelax, numPostRelax, coarsest_N, 1)
+        else: # If on the bottom of the V, we solve the coarsest matrix exactly
+            e_coarse = PCG(A_coarse, r_coarse, maxiter=100000)
+
+        # Correct the fine-grid x with the prolongated residual
+        x += mvmult(I_Prolong, e_coarse)
+
+        # Relax Again
+        x = Jacobi(x, A_fine, b, numiters=numPostRelax)
+
+        return x
+\end{lstlisting}
